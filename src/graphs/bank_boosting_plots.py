@@ -1,0 +1,183 @@
+# src/graphs/bank_boosting_plots.py
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+
+from sklearn.metrics import roc_curve, auc, confusion_matrix, classification_report
+
+
+def plot_bank_boosting_summary(results_boosting, save_dir):
+    """
+    results_boosting: results["boosting"] sub-dict from bank.py
+    Structure:
+    {
+        "20_80": [ {trial_record}, {trial_record}, {trial_record} ],
+        "50_50": [...],
+        "80_20": [...]
+    }
+
+    Each trial_record is expected to contain:
+      - "cv_train_score": float
+      - "cv_val_score": float
+      - "test_accuracy": float
+      - "test_metrics": dict (with at least "accuracy", "roc_auc", "precision", "recall", "f1")
+      - "y_test": list of ints
+      - "y_pred": list of ints
+      - "y_proba": list of floats or None
+    """
+
+    os.makedirs(save_dir, exist_ok=True)
+
+    # ------------------------------------------------------------------
+    # 1. Accuracy vs split (mean over 3 trials)
+    # ------------------------------------------------------------------
+    split_names = []
+    mean_train = []
+    mean_val = []
+    mean_test = []
+
+    # Also keep overall-best model for ROC/confusion matrix
+    best_model = None  # dict: {"split_name": ..., "trial_index": ..., "record": ...}
+
+    for split_name, trials in results_boosting.items():
+        split_names.append(split_name)
+
+        train_scores = [t["cv_train_score"] for t in trials]
+        val_scores = [t["cv_val_score"] for t in trials]
+        test_accs = [t["test_accuracy"] for t in trials]
+
+        mean_train.append(np.mean(train_scores))
+        mean_val.append(np.mean(val_scores))
+        mean_test.append(np.mean(test_accs))
+
+        # Track best test accuracy across all splits/trials
+        for idx, t in enumerate(trials):
+            if best_model is None or t["test_accuracy"] > best_model["record"]["test_accuracy"]:
+                best_model = {
+                    "split_name": split_name,
+                    "trial_index": idx,
+                    "record": t,
+                }
+
+    # Plot accuracy vs split
+    x = np.arange(len(split_names))
+
+    plt.figure()
+    plt.plot(split_names, mean_train, marker="o", label="Train (CV mean)")
+    plt.plot(split_names, mean_val, marker="o", label="Validation (CV mean)")
+    plt.plot(split_names, mean_test, marker="o", label="Test (mean of trials)")
+    plt.xlabel("Train/Test split")
+    plt.ylabel("Accuracy")
+    plt.title("Bank Dataset – Boosting accuracy vs split")
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(os.path.join(save_dir, "bank_boosting_accuracy.png"), bbox_inches="tight")
+    plt.close()
+
+    # ------------------------------------------------------------------
+    # 2. ROC curve for best model (if probabilities available)
+    # ------------------------------------------------------------------
+    if best_model is not None and best_model["record"]["y_proba"] is not None:
+        rec = best_model["record"]
+        y_test = np.array(rec["y_test"])
+        y_proba = np.array(rec["y_proba"])
+
+        fpr, tpr, _ = roc_curve(y_test, y_proba)
+        roc_auc = auc(fpr, tpr)
+
+        plt.figure()
+        plt.plot(fpr, tpr, label=f"ROC curve (AUC = {roc_auc:.3f})")
+        plt.plot([0, 1], [0, 1], "k--", label="Random guess")
+        plt.xlim([0.0, 1.0])
+        plt.ylim([0.0, 1.05])
+        plt.xlabel("False Positive Rate")
+        plt.ylabel("True Positive Rate")
+        plt.title("Bank Dataset – Boosting ROC curve (best model)")
+        plt.legend(loc="lower right")
+        plt.tight_layout()
+        plt.savefig(os.path.join(save_dir, "bank_boosting_roc_best_model.png"), bbox_inches="tight")
+        plt.close()
+    else:
+        roc_auc = None  # for reporting
+
+    # ------------------------------------------------------------------
+    # 3. Confusion matrix for best model
+    # ------------------------------------------------------------------
+    if best_model is not None:
+        rec = best_model["record"]
+        y_test = np.array(rec["y_test"])
+        y_pred = np.array(rec["y_pred"])
+
+        cm = confusion_matrix(y_test, y_pred)
+
+        plt.figure()
+        im = plt.imshow(cm, interpolation="nearest", cmap="Blues")
+        plt.title("Bank Dataset – Boosting Confusion Matrix (best model)")
+        plt.colorbar(im)
+        tick_marks = np.arange(cm.shape[0])
+        plt.xticks(tick_marks, tick_marks)
+        plt.yticks(tick_marks, tick_marks)
+        plt.xlabel("Predicted label")
+        plt.ylabel("True label")
+
+        # Add counts on the cells
+        thresh = cm.max() / 2.0
+        for i in range(cm.shape[0]):
+            for j in range(cm.shape[1]):
+                plt.text(
+                    j, i, format(cm[i, j], "d"),
+                    ha="center",
+                    va="center",
+                    color="white" if cm[i, j] > thresh else "black",
+                )
+        plt.tight_layout()
+        plt.savefig(os.path.join(save_dir, "bank_boosting_confusion_best_model.png"), bbox_inches="tight")
+        plt.close()
+
+    # ------------------------------------------------------------------
+    # 4. Text report: CV vs Test (overfitting) + best model summary
+    # ------------------------------------------------------------------
+    report_path = os.path.join(save_dir, "bank_boosting_report.txt")
+    with open(report_path, "w") as f:
+        f.write("Bank Dataset – Boosting Summary Report\n")
+        f.write("======================================\n\n")
+
+        f.write("Mean accuracy by split (averaged over 3 trials):\n")
+        for i, split_name in enumerate(split_names):
+            f.write(
+                f"  Split {split_name}: "
+                f"Train (CV) = {mean_train[i]:.4f}, "
+                f"Val (CV) = {mean_val[i]:.4f}, "
+                f"Test = {mean_test[i]:.4f}\n"
+            )
+
+        f.write("\n(Train vs Val/Test gives a sense of overfitting.\n")
+        f.write(" If Train >> Val/Test, model is likely overfitting.)\n\n")
+
+        if best_model is not None:
+            split_name = best_model["split_name"]
+            idx = best_model["trial_index"]
+            rec = best_model["record"]
+
+            f.write("\nBest model (by test accuracy):\n")
+            f.write(f"  Split: {split_name}\n")
+            f.write(f"  Trial index: {idx}\n")
+            f.write(f"  Best params: {rec.get('best_params', {})}\n")
+
+            tm = rec["test_metrics"]
+            f.write("\n  Test metrics:\n")
+            for k, v in tm.items():
+                f.write(f"    {k}: {v:.4f}\n")
+
+            if roc_auc is not None:
+                f.write(f"  ROC-AUC used in ROC plot: {roc_auc:.4f}\n")
+
+            # Classification report (precision/recall/F1 per class)
+            y_test = np.array(rec["y_test"])
+            y_pred = np.array(rec["y_pred"])
+            f.write("\nClassification report (test set):\n")
+            f.write(classification_report(y_test, y_pred))
+        else:
+            f.write("No best model found (no trials?)\n")
+
+    print(f"[bank_boosting_plots] Saved accuracy, ROC, confusion matrix plots and report to {save_dir}")
