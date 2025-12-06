@@ -6,7 +6,7 @@ DATA INFO:
 --------------------------------------------------------------------------------
 <class 'pandas.core.frame.DataFrame'>
 RangeIndex: 41188 entries, 0 to 41187
-Data columns (total 21 columns):
+Data columns (total 19 columns):
  #   Column          Non-Null Count  Dtype  
 ---  ------          --------------  -----  
  0   age             41188 non-null  int64  
@@ -19,43 +19,39 @@ Data columns (total 21 columns):
  7   contact         41188 non-null  object 
  8   month           41188 non-null  object 
  9   day_of_week     41188 non-null  object 
- 10  duration        41188 non-null  int64  
- 11  campaign        41188 non-null  int64  
- 12  pdays           41188 non-null  int64  
- 13  previous        41188 non-null  int64  
- 14  poutcome        41188 non-null  object 
- 15  emp.var.rate    41188 non-null  float64
- 16  cons.price.idx  41188 non-null  float64
- 17  cons.conf.idx   41188 non-null  float64
- 18  euribor3m       41188 non-null  float64
- 19  nr.employed     41188 non-null  float64
- 20  y               41188 non-null  object 
-dtypes: float64(5), int64(5), object(11)
-memory usage: 6.6+ MB
+ 10  pdays           41188 non-null  int64  
+ 11  previous        41188 non-null  int64  
+ 12  poutcome        41188 non-null  object 
+ 13  emp.var.rate    41188 non-null  float64
+ 14  cons.price.idx  41188 non-null  float64
+ 15  cons.conf.idx   41188 non-null  float64
+ 16  euribor3m       41188 non-null  float64
+ 17  nr.employed     41188 non-null  float64
+ 18  y               41188 non-null  object 
+dtypes: float64(5), int64(3), object(11)
+memory usage: 6.0+ MB
 
 
 DATA DESCRIBE:
 --------------------------------------------------------------------------------
-               age      duration      campaign         pdays  ...  cons.price.idx  cons.conf.idx     euribor3m   nr.employed
-count  41188.00000  41188.000000  41188.000000  41188.000000  ...    41188.000000   41188.000000  41188.000000  41188.000000
-mean      40.02406    258.285010      2.567593    962.475454  ...       93.575664     -40.502600      3.621291   5167.035911
-std       10.42125    259.279249      2.770014    186.910907  ...        0.578840       4.628198      1.734447     72.251528
-min       17.00000      0.000000      1.000000      0.000000  ...       92.201000     -50.800000      0.634000   4963.600000
-25%       32.00000    102.000000      1.000000    999.000000  ...       93.075000     -42.700000      1.344000   5099.100000
-50%       38.00000    180.000000      2.000000    999.000000  ...       93.749000     -41.800000      4.857000   5191.000000
-75%       47.00000    319.000000      3.000000    999.000000  ...       93.994000     -36.400000      4.961000   5228.100000
-max       98.00000   4918.000000     56.000000    999.000000  ...       94.767000     -26.900000      5.045000   5228.100000
+               age         pdays  ...     euribor3m   nr.employed
+count  41188.00000  41188.000000  ...  41188.000000  41188.000000
+mean      40.02406    962.475454  ...      3.621291   5167.035911
+std       10.42125    186.910907  ...      1.734447     72.251528
+min       17.00000      0.000000  ...      0.634000   4963.600000
+25%       32.00000    999.000000  ...      1.344000   5099.100000
+50%       38.00000    999.000000  ...      4.857000   5191.000000
+75%       47.00000    999.000000  ...      4.961000   5228.100000
+max       98.00000    999.000000  ...      5.045000   5228.100000
 
-[8 rows x 10 columns]
+[8 rows x 8 columns]
 
 CORRELATION OF NUMERIC FEATURES WITH TARGET:
 --------------------------------------------------------------------------------
 _y                1.000000
-duration          0.405274
 previous          0.230181
 cons.conf.idx     0.054878
 age               0.030399
-campaign         -0.066357
 cons.price.idx   -0.136211
 emp.var.rate     -0.298334
 euribor3m        -0.307771

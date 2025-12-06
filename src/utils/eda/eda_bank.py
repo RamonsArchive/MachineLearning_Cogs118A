@@ -56,10 +56,10 @@ def eda_bank(data):
     plt.close()
     print(f"Plot 2 saved: eda_bank_plots_2.png")
 
-    # ----- Boxplot for strongest predictor -----
+    # ----- Boxplot for age by outcome -----
     plt.figure(figsize=(8,6))
-    sns.boxplot(x="y", y="duration", data=data)
-    plt.title("Call Duration by Subscription Outcome")
+    sns.boxplot(x="y", y="age", data=data)
+    plt.title("Age Distribution by Subscription Outcome")
     plt.savefig(os.path.join(output_dir, "eda_bank_plots_3.png"), dpi=300, bbox_inches='tight')
     plt.close()
     print(f"Plot 3 saved: eda_bank_plots_3.png")

@@ -1,8 +1,11 @@
 import os
 import sys
 import json
-# Add the src directory to the Python path
 
+# Prevent Python from caching bytecode (.pyc files)
+sys.dont_write_bytecode = True
+
+# Add the src directory to the Python path
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 
 from utils.load.load_bank import load_bank_data
@@ -11,8 +14,10 @@ from utils.eda.eda_bank import eda_bank
 from sklearn.model_selection import train_test_split
 
 from models.boosting import run_boosting_experiment
+from models.random_forest import run_random_forest_experiment
 
 from graphs.bank_boosting_plots import plot_bank_boosting_summary
+from graphs.bank_random_forest_plots import plot_bank_random_forest_summary
 
 
 
@@ -25,16 +30,16 @@ SVM_NAME = "svm"
 def generate_boosting(train_df, test_df, RANDOM_STATE):
     target_col = "y"
     predictors = [c for c in train_df.columns if c != target_col]
-    param_grid = {
-        "model__n_estimators": [100, 200, 300, 600, 1000, 1200],
-        "model__learning_rate": [0.001, 0.005, 0.01, 0.03, 0.1],
-        "model__max_depth": [1, 2, 3, 5, 7, 9],
-    }
     # param_grid = {
-    #     "model__n_estimators": [100],
-    #     "model__learning_rate": [0.001],
-    #     "model__max_depth": [1],
+    #     "model__n_estimators": [100, 200, 300, 600, 1000, 1200],
+    #     "model__learning_rate": [0.001, 0.005, 0.01, 0.03, 0.1],
+    #     "model__max_depth": [1, 2, 3, 5, 7, 9],
     # }
+    param_grid = {
+        "model__n_estimators": [1200, 2000],
+        "model__learning_rate": [0.01, 0.05],
+        "model__max_depth": [2, 5],
+    }
 
     results = run_boosting_experiment(
         train_df=train_df,
@@ -49,10 +54,62 @@ def generate_boosting(train_df, test_df, RANDOM_STATE):
     return results
 
 def generate_random_forest(train_df, test_df, RANDOM_STATE):
-    return train_df, test_df
+    target_col = "y"
+    predictors = [c for c in train_df.columns if c != target_col]
+    
+    # Reduced grid for efficiency (72 combos vs 288)
+    # Random Forest is robust; fewer hyperparams often sufficient
+    param_grid = {
+        "model__n_estimators": [200, 500, 1000],    # fewer trees still effective
+        "model__max_depth": [10, 20, None],         # 3 depths
+        "model__min_samples_split": [2, 5],         # 2 values
+        "model__min_samples_leaf": [1, 2],          # 2 values
+        "model__max_features": ['sqrt', 'log2'],    # 2 feature selection methods
+    }
+
+    results = run_random_forest_experiment(
+        train_df=train_df,
+        test_df=test_df,
+        predictors=predictors,
+        target_col=target_col,
+        problem_type="classification",
+        random_state=RANDOM_STATE,
+        param_grid=param_grid,
+    )
+
+    return results
 
 def generate_neural_network(train_df, test_df, RANDOM_STATE):
-    return train_df, test_df
+    # target_col = "y"
+    # predictors = [c for c in train_df.columns if c != target_col]
+
+    # hidden_layer_sizes_grid = [
+    #     (100,),
+    #     (100,50),
+    #     (200, 100),
+    #     (100, 50, 25),
+    #     (100, 75, 50),
+    #     (100, 75, 50, 25),
+    # ]
+    # param_grid = {
+    #     "model__learning_rate": [0.001, 0.005, 0.01, 0.03],
+    #     "model__alpha": [0, 0.0001, 0.001, 0.01, 0.1],
+    #     "model__batch_size": [32, 64, 128, 'auto'],
+    # }
+
+    # results = run_neural_net_experiment( # must implement
+    #     train_df=train_df,
+    #     test_df=test_df,
+    #     predictors=predictors,
+    #     target_col=target_col,
+    #     problem_type="classification",
+    #     random_state=RANDOM_STATE,
+    #     hidden_layer_sizes_grid=hidden_layer_sizes_grid,
+    #     param_grid=param_grid,
+    # )
+    
+    # return results
+    return train_df
 
 def generate_svm(train_df, test_df, RANDOM_STATE):
     return train_df, test_df
@@ -63,6 +120,16 @@ def main():
     curr_dir = os.path.dirname(os.path.abspath(__file__))
     data = load_bank_data(curr_dir)
     clean_df = clean_bank(data)
+    
+    # DEBUG: Verify data leakage columns are removed
+    print("\n=== DEBUG: Checking for data leakage ===")
+    print(f"Columns in clean_df: {clean_df.columns.tolist()}")
+    print(f"'duration' in columns: {'duration' in clean_df.columns}")
+    print(f"'campaign' in columns: {'campaign' in clean_df.columns}")
+    if 'duration' in clean_df.columns or 'campaign' in clean_df.columns:
+        raise ValueError("DATA LEAKAGE DETECTED! duration or campaign still in data!")
+    print("=== No data leakage detected ===\n")
+    
     eda_bank(clean_df)  # ok if this just prints / sanity checks
 
     # ------------------------------------------------------------------
@@ -100,6 +167,7 @@ def main():
         print(f"\n===== SPLIT {split_name} (test_size={test_size}) =====")
 
         results[BOOSTING_NAME][split_name] = []
+        results[RANDOM_FOREST_NAME][split_name] = []
 
         for trial in range(n_trials):
             # Different random_state per trial so splits differ
@@ -115,6 +183,7 @@ def main():
 
             # ----- Run Boosting -----
             boosting_result = generate_boosting(train_df, test_df, rs)
+            random_forest_result = generate_random_forest(train_df, test_df, rs)
 
             # EXPECTED fields in boosting_result (you can tweak names to your impl):
             # {
@@ -126,7 +195,7 @@ def main():
             #   ... (other metrics ok)
             # }
 
-            trial_record = {
+            boosting_trial_record = {
                 "trial": trial,
                 "best_params": boosting_result["best_params"],
                 "cv_train_score": boosting_result["cv_train_score"],
@@ -143,17 +212,50 @@ def main():
                 ),
             }
 
-            results[BOOSTING_NAME][split_name].append(trial_record)
+            random_forest_record = {
+                "trial": trial,
+                "best_params": random_forest_result["best_params"],
+                "cv_train_score": random_forest_result["cv_train_score"],
+                "cv_val_score": random_forest_result["cv_val_score"],
+                "test_accuracy": random_forest_result["test_metrics"]["accuracy"],
+                "test_metrics": random_forest_result["test_metrics"],
+                # For plots / confusion / ROC:
+                "y_test": random_forest_result["y_test"].tolist(),
+                "y_pred": random_forest_result["y_pred"].tolist(),
+                "y_proba": (
+                    random_forest_result["y_proba"].tolist()
+                    if random_forest_result["y_proba"] is not None
+                    else None
+                ),
+                # Feature importances (unique to RF)
+                "feature_importances": (
+                    random_forest_result["feature_importances"].tolist()
+                    if random_forest_result["feature_importances"] is not None
+                    else None
+                ),
+                "feature_names": random_forest_result["feature_names"],
+            }
+
+            results[BOOSTING_NAME][split_name].append(boosting_trial_record)
+            results[RANDOM_FOREST_NAME][split_name].append(random_forest_record)
 
     # Save results to JSON
-    out_path = os.path.join(curr_dir, "..", "results", "bank_boosting_results.json")
-    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    results_dir = os.path.join(curr_dir, "..", "results")
+    os.makedirs(results_dir, exist_ok=True)
+    
+    # Save all results together
+    out_path = os.path.join(results_dir, "bank_all_results.json")
     with open(out_path, "w") as f:
         json.dump(results, f, indent=2)
+    print(f"\n[bank.py] Saved all results to {out_path}")
 
-    # Plot results
-    plots_dir = os.path.join(curr_dir, "../..", "plots/bank_plots", "bank_boosting_plots")
-    plot_bank_boosting_summary(results[BOOSTING_NAME], plots_dir)
+    # Plot Boosting results
+    boosting_plots_dir = os.path.join(curr_dir, "../..", "plots/bank_plots", "bank_boosting_plots")
+    plot_bank_boosting_summary(results[BOOSTING_NAME], boosting_plots_dir)
+    
+    # Plot Random Forest results
+    rf_plots_dir = os.path.join(curr_dir, "../..", "plots/bank_plots", "bank_random_forest_plots")
+    plot_bank_random_forest_summary(results[RANDOM_FOREST_NAME], rf_plots_dir)
 
 
 if __name__ == "__main__":

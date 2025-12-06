@@ -27,4 +27,6 @@ def clean_bank(data):
     # for r, c in zip(rows, cols):
     #     print(f"Row {r}, Column '{data.columns[c]}'")
 
-    return data
+    exclude_cols = ["duration", "campaign"]  # Clear data leakage
+    df = data.drop(columns=exclude_cols)
+    return df
