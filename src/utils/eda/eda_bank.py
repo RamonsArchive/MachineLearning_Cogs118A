@@ -8,6 +8,8 @@ def eda_bank(data):
     # Create eda_plots directory if it doesn't exist
     output_dir = "plots/eda_plots"
     os.makedirs(output_dir, exist_ok=True)
+
+    df = data.copy()
     
     # ----- Save text report with info and describe -----
     report_path = os.path.join(output_dir, "eda_bank_plots.txt")
@@ -19,19 +21,19 @@ def eda_bank(data):
         f.write("DATA INFO:\n")
         f.write("-" * 80 + "\n")
         buffer = StringIO()
-        data.info(buf=buffer)
+        df.info(buf=buffer)
         f.write(buffer.getvalue())
-        f.write("\n\n")
+        f.write("\n\n") 
         
         f.write("DATA DESCRIBE:\n")
         f.write("-" * 80 + "\n")
-        f.write(str(data.describe()))
+        f.write(str(df.describe()))
         f.write("\n\n")
         
         # Encode y for correlation
-        numeric_cols = data.select_dtypes(include=['int64','float64']).columns
-        data["_y"] = (data["y"] == "yes").astype(int)
-        corr_with_target = data[numeric_cols.tolist() + ["_y"]].corr()["_y"].sort_values(ascending=False)
+        numeric_cols = df.select_dtypes(include=['int64','float64']).columns
+        df["_y"] = (df["y"] == "yes").astype(int)
+        corr_with_target = df[numeric_cols.tolist() + ["_y"]].corr()["_y"].sort_values(ascending=False)
         f.write("CORRELATION OF NUMERIC FEATURES WITH TARGET:\n")
         f.write("-" * 80 + "\n")
         f.write(str(corr_with_target))
@@ -41,16 +43,16 @@ def eda_bank(data):
 
     # ----- class inbalance -----
     plt.figure(figsize=(6, 4))
-    sns.countplot(x="y", data=data)
+    sns.countplot(x="y", data=df)
     plt.title("Class Distribution (Subscription)")
     plt.savefig(os.path.join(output_dir, "eda_bank_plots_1.png"), dpi=300, bbox_inches='tight')
     plt.close()
     print(f"Plot 1 saved: eda_bank_plots_1.png")
 
     # ----- Correlation Heatmap (numeric only) -----
-    numeric_cols = data.select_dtypes(include=['int64','float64']).columns
+    numeric_cols = df.select_dtypes(include=['int64','float64']).columns
     plt.figure(figsize=(10,8))
-    sns.heatmap(data[numeric_cols].corr(), annot=True, cmap="coolwarm")
+    sns.heatmap(df[numeric_cols].corr(), annot=True, cmap="coolwarm")
     plt.title("Correlation Heatmap (Numeric Features)")
     plt.savefig(os.path.join(output_dir, "eda_bank_plots_2.png"), dpi=300, bbox_inches='tight')
     plt.close()
@@ -58,7 +60,7 @@ def eda_bank(data):
 
     # ----- Boxplot for age by outcome -----
     plt.figure(figsize=(8,6))
-    sns.boxplot(x="y", y="age", data=data)
+    sns.boxplot(x="y", y="age", data=df)
     plt.title("Age Distribution by Subscription Outcome")
     plt.savefig(os.path.join(output_dir, "eda_bank_plots_3.png"), dpi=300, bbox_inches='tight')
     plt.close()
@@ -66,7 +68,7 @@ def eda_bank(data):
 
     # ----- Category Subscription Rates -----
     plt.figure(figsize=(10,6))
-    (data.groupby("job")["y"]
+    (df.groupby("job")["y"]
          .value_counts(normalize=True)
          .unstack()["yes"]
          .sort_values()
