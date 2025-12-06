@@ -15,9 +15,13 @@ from sklearn.model_selection import train_test_split
 
 from models.boosting import run_boosting_experiment
 from models.random_forest import run_random_forest_experiment
+from models.neural_net import run_neural_net_experiment
+from models.svm import run_svm_experiment
 
 from graphs.bank_boosting_plots import plot_bank_boosting_summary
 from graphs.bank_random_forest_plots import plot_bank_random_forest_summary
+from graphs.bank_neural_network_plots import plot_bank_neural_network_summary
+from graphs.bank_svm_plots import plot_bank_svm_summary
 
 
 
@@ -30,16 +34,16 @@ SVM_NAME = "svm"
 def generate_boosting(train_df, test_df, RANDOM_STATE):
     target_col = "y"
     predictors = [c for c in train_df.columns if c != target_col]
-    # param_grid = {
-    #     "model__n_estimators": [100, 200, 300, 600, 1000, 1200],
-    #     "model__learning_rate": [0.001, 0.005, 0.01, 0.03, 0.1],
-    #     "model__max_depth": [1, 2, 3, 5, 7, 9],
-    # }
     param_grid = {
-        "model__n_estimators": [1200, 2000],
-        "model__learning_rate": [0.01, 0.05],
-        "model__max_depth": [2, 5],
+        "model__n_estimators": [300, 600, 1000, 1200, 2000],
+        "model__learning_rate": [0.005, 0.01, 0.03, 0.1],
+        "model__max_depth": [1, 2, 3, 5, 7, 9],
     }
+    # param_grid = {
+    #     "model__n_estimators": [1200],
+    #     "model__learning_rate": [0.01],
+    #     "model__max_depth": [2],
+    # }
 
     results = run_boosting_experiment(
         train_df=train_df,
@@ -67,6 +71,15 @@ def generate_random_forest(train_df, test_df, RANDOM_STATE):
         "model__max_features": ['sqrt', 'log2'],    # 2 feature selection methods
     }
 
+    # param_grid = {
+    #     "model__n_estimators": [1000],    # fewer trees still effective
+    #     "model__max_depth": [10],         # 3 depths
+    #     "model__min_samples_split": [2],         # 2 values
+    #     "model__min_samples_leaf": [1],          # 2 values
+    #     "model__max_features": ['sqrt'],    # 2 feature selection methods
+    # }
+
+
     results = run_random_forest_experiment(
         train_df=train_df,
         test_df=test_df,
@@ -80,39 +93,63 @@ def generate_random_forest(train_df, test_df, RANDOM_STATE):
     return results
 
 def generate_neural_network(train_df, test_df, RANDOM_STATE):
-    # target_col = "y"
-    # predictors = [c for c in train_df.columns if c != target_col]
+    target_col = "y"
+    predictors = [c for c in train_df.columns if c != target_col]
 
-    # hidden_layer_sizes_grid = [
-    #     (100,),
-    #     (100,50),
-    #     (200, 100),
-    #     (100, 50, 25),
-    #     (100, 75, 50),
-    #     (100, 75, 50, 25),
-    # ]
-    # param_grid = {
-    #     "model__learning_rate": [0.001, 0.005, 0.01, 0.03],
-    #     "model__alpha": [0, 0.0001, 0.001, 0.01, 0.1],
-    #     "model__batch_size": [32, 64, 128, 'auto'],
-    # }
-
-    # results = run_neural_net_experiment( # must implement
-    #     train_df=train_df,
-    #     test_df=test_df,
-    #     predictors=predictors,
-    #     target_col=target_col,
-    #     problem_type="classification",
-    #     random_state=RANDOM_STATE,
-    #     hidden_layer_sizes_grid=hidden_layer_sizes_grid,
-    #     param_grid=param_grid,
-    # )
+    # Network architectures to try
+    hidden_layer_sizes_grid = [
+        (100,),           # 1 layer
+        (100, 50),        # 2 layers
+        (100, 50, 25),    # 3 layers
+    ]
     
-    # return results
-    return train_df
+    # Other hyperparameters (reduced for efficiency)
+    # Full grid: 3 * 3 * 3 * 3 = 81 combos
+    param_grid = {
+        "model__learning_rate_init": [0.001, 0.01, 0.03],
+        "model__alpha": [0.0001, 0.001, 0.01],
+        "model__batch_size": [32, 64, 'auto'],
+    }
+
+    results = run_neural_net_experiment(
+        train_df=train_df,
+        test_df=test_df,
+        predictors=predictors,
+        target_col=target_col,
+        problem_type="classification",
+        random_state=RANDOM_STATE,
+        hidden_layer_sizes_grid=hidden_layer_sizes_grid,
+        param_grid=param_grid,
+    )
+    
+    return results
 
 def generate_svm(train_df, test_df, RANDOM_STATE):
-    return train_df, test_df
+    target_col = "y"
+    predictors = [c for c in train_df.columns if c != target_col]
+    
+    # SVM Hyperparameters:
+    # - kernel: 'rbf' (flexible, non-linear) vs 'linear' (faster, good for high-dim)
+    # - C: Regularization (higher = tighter fit, risk overfitting)
+    # - gamma: Kernel coefficient (higher = complex boundaries)
+    # Grid: 2 * 4 * 3 = 24 combos (reasonable)
+    param_grid = {
+        "model__kernel": ['rbf', 'linear'],
+        "model__C": [0.1, 1, 10, 100],
+        "model__gamma": ['scale', 0.01, 0.1],  # ignored for linear kernel
+    }
+
+    results = run_svm_experiment(
+        train_df=train_df,
+        test_df=test_df,
+        predictors=predictors,
+        target_col=target_col,
+        problem_type="classification",
+        random_state=RANDOM_STATE,
+        param_grid=param_grid,
+    )
+
+    return results
 
 
 
@@ -168,6 +205,8 @@ def main():
 
         results[BOOSTING_NAME][split_name] = []
         results[RANDOM_FOREST_NAME][split_name] = []
+        results[NEURAL_NETWORK_NAME][split_name] = []
+        results[SVM_NAME][split_name] = []
 
         for trial in range(n_trials):
             # Different random_state per trial so splits differ
@@ -181,9 +220,11 @@ def main():
                 stratify=clean_df["y"]  # stratify for classification
             )
 
-            # ----- Run Boosting -----
+            # ----- Run Models -----
             boosting_result = generate_boosting(train_df, test_df, rs)
             random_forest_result = generate_random_forest(train_df, test_df, rs)
+            neural_network_result = generate_neural_network(train_df, test_df, rs)
+            svm_result = generate_svm(train_df, test_df, rs)
 
             # EXPECTED fields in boosting_result (you can tweak names to your impl):
             # {
@@ -236,8 +277,48 @@ def main():
                 "feature_names": random_forest_result["feature_names"],
             }
 
-            results[BOOSTING_NAME][split_name].append(boosting_trial_record)
+            neural_network_record = {
+                "trial": trial,
+                "best_params": neural_network_result["best_params"],
+                "cv_train_score": neural_network_result["cv_train_score"],
+                "cv_val_score": neural_network_result["cv_val_score"],
+                "test_accuracy": neural_network_result["test_metrics"]["accuracy"],
+                "test_metrics": neural_network_result["test_metrics"],
+                # For plots / confusion / ROC:
+                "y_test": neural_network_result["y_test"].tolist(),
+                "y_pred": neural_network_result["y_pred"].tolist(),
+                "y_proba": (
+                    neural_network_result["y_proba"].tolist()
+                    if neural_network_result["y_proba"] is not None
+                    else None
+                ),
+                # Training info (unique to NN)
+                "training_info": neural_network_result["training_info"],
+            }
+
+            svm_record = {
+                "trial": trial,
+                "best_params": svm_result["best_params"],
+                "cv_train_score": svm_result["cv_train_score"],
+                "cv_val_score": svm_result["cv_val_score"],
+                "test_accuracy": svm_result["test_metrics"]["accuracy"],
+                "test_metrics": svm_result["test_metrics"],
+                # For plots / confusion / ROC:
+                "y_test": svm_result["y_test"].tolist(),
+                "y_pred": svm_result["y_pred"].tolist(),
+                "y_proba": (
+                    svm_result["y_proba"].tolist()
+                    if svm_result["y_proba"] is not None
+                    else None
+                ),
+                # SVM info (unique to SVM)
+                "svm_info": svm_result["svm_info"],
+            }
+
+            # results[BOOSTING_NAME][split_name].append(boosting_trial_record)
             results[RANDOM_FOREST_NAME][split_name].append(random_forest_record)
+            results[NEURAL_NETWORK_NAME][split_name].append(neural_network_record)
+            results[SVM_NAME][split_name].append(svm_record)
 
     # Save results to JSON
     results_dir = os.path.join(curr_dir, "..", "results")
@@ -249,13 +330,21 @@ def main():
         json.dump(results, f, indent=2)
     print(f"\n[bank.py] Saved all results to {out_path}")
 
-    # Plot Boosting results
+    # # Plot Boosting results
     boosting_plots_dir = os.path.join(curr_dir, "../..", "plots/bank_plots", "bank_boosting_plots")
     plot_bank_boosting_summary(results[BOOSTING_NAME], boosting_plots_dir)
     
     # Plot Random Forest results
     rf_plots_dir = os.path.join(curr_dir, "../..", "plots/bank_plots", "bank_random_forest_plots")
     plot_bank_random_forest_summary(results[RANDOM_FOREST_NAME], rf_plots_dir)
+    
+    # Plot Neural Network results
+    nn_plots_dir = os.path.join(curr_dir, "../..", "plots/bank_plots", "bank_neural_network_plots")
+    plot_bank_neural_network_summary(results[NEURAL_NETWORK_NAME], nn_plots_dir)
+    
+    # Plot SVM results
+    svm_plots_dir = os.path.join(curr_dir, "../..", "plots/bank_plots", "bank_svm_plots")
+    plot_bank_svm_summary(results[SVM_NAME], svm_plots_dir)
 
 
 if __name__ == "__main__":
