@@ -135,8 +135,8 @@ def generate_svm(train_df, test_df, RANDOM_STATE):
     # Grid: 2 * 4 * 3 = 24 combos (reasonable)
     param_grid = {
         "model__kernel": ['rbf', 'linear'],
-        "model__C": [0.1, 1, 10, 100],
-        "model__gamma": ['scale', 0.01, 0.1],  # ignored for linear kernel
+        "model__C": [1, 10, 100],
+        "model__gamma": ['scale', 0.1],  # ignored for linear kernel
     }
 
     results = run_svm_experiment(
