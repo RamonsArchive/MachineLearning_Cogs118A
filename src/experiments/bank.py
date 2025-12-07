@@ -315,7 +315,7 @@ def main():
                 "svm_info": svm_result["svm_info"],
             }
 
-            # results[BOOSTING_NAME][split_name].append(boosting_trial_record)
+            results[BOOSTING_NAME][split_name].append(boosting_trial_record)
             results[RANDOM_FOREST_NAME][split_name].append(random_forest_record)
             results[NEURAL_NETWORK_NAME][split_name].append(neural_network_record)
             results[SVM_NAME][split_name].append(svm_record)

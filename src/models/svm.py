@@ -85,7 +85,7 @@ def _build_preprocessing_and_model(num_cols, cat_cols, problem_type, random_stat
     if problem_type == "classification":
         model = SVC(
             kernel=kernel,
-            probability=probability,  # Enable predict_proba for ROC curves
+            probability=False,  # done enable predict_proba. Do ROC curves with decision func
             random_state=random_state,
             cache_size=1000,  # MB, increase for faster training
         )
@@ -268,14 +268,23 @@ def run_svm_experiment(
     y_proba = None
 
     if problem_type == "classification":
-        # Get probability scores for ROC curve
-        if hasattr(best_estimator.named_steps["model"], "predict_proba"):
+        # Use decision_function for ROC-AUC (faster than predict_proba!)
+        # decision_function returns signed distance to hyperplane - works perfectly for ranking
+        if hasattr(best_estimator.named_steps["model"], "decision_function"):
+            y_proba = best_estimator.decision_function(X_test)
+            try:
+                roc_auc = roc_auc_score(y_test, y_proba)
+            except ValueError:
+                roc_auc = np.nan
+        elif hasattr(best_estimator.named_steps["model"], "predict_proba"):
+            # Fallback to predict_proba if decision_function not available
             y_proba = best_estimator.predict_proba(X_test)[:, 1]
             try:
                 roc_auc = roc_auc_score(y_test, y_proba)
             except ValueError:
                 roc_auc = np.nan
         else:
+            y_proba = None
             roc_auc = np.nan
 
         test_metrics["accuracy"] = accuracy_score(y_test, y_pred)
