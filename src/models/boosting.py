@@ -8,7 +8,8 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler, LabelEncoder
 
 from sklearn.ensemble import GradientBoostingClassifier, GradientBoostingRegressor
-from sklearn.model_selection import GridSearchCV, KFold
+from sklearn.model_selection import GridSearchCV, StratifiedKFold
+from sklearn.utils.class_weight import compute_sample_weight
 
 from sklearn.metrics import (
     accuracy_score,
@@ -117,14 +118,14 @@ def run_boosting_experiment(
 
     # Choose scoring
     if problem_type == "classification":
-        scoring = "roc_auc"
+        scoring = "f1"  # Optimizes for balance of precision AND recall
     else:
         scoring = "neg_mean_squared_error"
 
     # =========================
     # 4. Grid search (10-fold CV) on TRAIN ONLY
     # =========================
-    cv = KFold(n_splits=10, shuffle=True, random_state=random_state)
+    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=random_state)  # Stratified for imbalanced data
 
     grid_search = GridSearchCV(
         estimator=pipeline,
@@ -142,8 +143,14 @@ def run_boosting_experiment(
     print(f"Hyperparameter combinations: "
           f"{len(param_grid['model__n_estimators']) * len(param_grid['model__learning_rate']) * len(param_grid['model__max_depth'])}")
     print("Fitting GridSearchCV (10-fold CV on TRAIN ONLY)...")
+    print("Using class-balanced sample weights to improve recall on minority class.")
 
-    grid_search.fit(X_train, y_train)
+    # Compute sample weights to penalize missing minority class more
+    if problem_type == "classification":
+        sample_weights = compute_sample_weight('balanced', y_train)
+        grid_search.fit(X_train, y_train, model__sample_weight=sample_weights)
+    else:
+        grid_search.fit(X_train, y_train)
 
     best_estimator = grid_search.best_estimator_
     best_params = grid_search.best_params_

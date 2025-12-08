@@ -48,8 +48,8 @@ from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler, LabelEncoder
 
-from sklearn.svm import SVC, SVR
-from sklearn.model_selection import GridSearchCV, KFold
+from sklearn.svm import SVC, SVR, LinearSVC
+from sklearn.model_selection import GridSearchCV, StratifiedKFold
 
 from sklearn.metrics import (
     accuracy_score,
@@ -64,16 +64,18 @@ from sklearn.metrics import (
 
 
 def _build_preprocessing_and_model(num_cols, cat_cols, problem_type, random_state,
-                                    kernel='rbf', probability=True):
+                                    use_linear_svc=True):
     """
     Create a preprocessing + model pipeline.
 
     - num_cols -> StandardScaler (crucial for SVM!)
     - cat_cols -> OneHotEncoder
-    - model   -> SVC or SVR
+    - model   -> LinearSVC (fast, O(n)) or SVC (slow, O(n²))
     
     Note: StandardScaler is CRITICAL for SVM because it uses distance-based
     calculations. Features on different scales will dominate the kernel.
+    
+    LinearSVC uses liblinear solver which is MUCH faster for large datasets.
     """
     preprocessor = ColumnTransformer(
         transformers=[
@@ -83,15 +85,23 @@ def _build_preprocessing_and_model(num_cols, cat_cols, problem_type, random_stat
     )
 
     if problem_type == "classification":
-        model = SVC(
-            kernel=kernel,
-            probability=False,  # done enable predict_proba. Do ROC curves with decision func
-            random_state=random_state,
-            cache_size=1000,  # MB, increase for faster training
-        )
+        if use_linear_svc:
+            # LinearSVC: O(n) complexity, MUCH faster for large datasets
+            # dual=False is faster when n_samples > n_features (our case after one-hot)
+            model = LinearSVC(
+                random_state=random_state,
+                dual=False,  # Faster when n_samples > n_features
+                max_iter=10000,  # Ensure convergence
+                class_weight='balanced',  # Penalize missing minority class more!
+            )
+        else:
+            model = SVC(
+                probability=False,
+                random_state=random_state,
+                cache_size=1000,
+            )
     elif problem_type == "regression":
         model = SVR(
-            kernel=kernel,
             cache_size=1000,
         )
     else:
@@ -177,24 +187,22 @@ def run_svm_experiment(
     # 3. Define hyperparameter grid
     # =========================
     if param_grid is None:
-        # Default grid balancing thoroughness and speed
-        # RBF kernel with gamma tuning + linear kernel
+        # Default grid for LinearSVC (fast linear SVM)
+        # LinearSVC doesn't have kernel or gamma - just C and penalty
         param_grid = {
-            "model__kernel": ['rbf', 'linear'],
             "model__C": [0.1, 1, 10, 100],
-            "model__gamma": ['scale', 0.01, 0.1],  # ignored when kernel='linear'
         }
 
     # Choose scoring
     if problem_type == "classification":
-        scoring = "roc_auc"
+        scoring = "f1"  # Optimizes for balance of precision AND recall
     else:
         scoring = "neg_mean_squared_error"
 
     # =========================
     # 4. Grid search (10-fold CV) on TRAIN ONLY
     # =========================
-    cv = KFold(n_splits=10, shuffle=True, random_state=random_state)
+    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=random_state)  # Stratified for imbalanced data
 
     # Calculate total combinations for logging
     total_combos = 1
@@ -212,12 +220,11 @@ def run_svm_experiment(
         return_train_score=True,
     )
 
-    print("\n=== GRID SEARCH: Support Vector Machine ===")
+    print("\n=== GRID SEARCH: Support Vector Machine (LinearSVC) ===")
     print(f"Training samples: {len(X_train)}")
     print(f"Hyperparameter combinations: {total_combos}")
-    print(f"Kernels being tested: {param_grid.get('model__kernel', ['rbf'])}")
+    print("Using LinearSVC (O(n) complexity - fast for large datasets)")
     print("Fitting GridSearchCV (10-fold CV on TRAIN ONLY)...")
-    print("Note: SVM can be slow on large datasets. Using cache_size=1000MB.")
 
     grid_search.fit(X_train, y_train)
 
@@ -318,11 +325,10 @@ def run_svm_experiment(
     # =========================
     final_model = best_estimator.named_steps["model"]
     svm_info = {
-        "kernel": best_params.get("model__kernel", final_model.kernel),
+        "model_type": "LinearSVC",
         "C": best_params.get("model__C", final_model.C),
-        "gamma": best_params.get("model__gamma", final_model.gamma),
-        "n_support": final_model.n_support_.tolist() if hasattr(final_model, 'n_support_') else None,
-        "total_support_vectors": int(np.sum(final_model.n_support_)) if hasattr(final_model, 'n_support_') else None,
+        "n_features": final_model.coef_.shape[1] if hasattr(final_model, 'coef_') else None,
+        "n_iterations": final_model.n_iter_ if hasattr(final_model, 'n_iter_') else None,
     }
 
     # =========================

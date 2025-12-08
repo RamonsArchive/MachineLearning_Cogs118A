@@ -64,11 +64,11 @@ def generate_random_forest(train_df, test_df, RANDOM_STATE):
     # Reduced grid for efficiency (72 combos vs 288)
     # Random Forest is robust; fewer hyperparams often sufficient
     param_grid = {
-        "model__n_estimators": [200, 500, 1000],    # fewer trees still effective
+        "model__n_estimators": [200, 300, 500, 1000],    # fewer trees still effective
         "model__max_depth": [10, 20, None],         # 3 depths
-        "model__min_samples_split": [2, 5],         # 2 values
-        "model__min_samples_leaf": [1, 2],          # 2 values
-        "model__max_features": ['sqrt', 'log2'],    # 2 feature selection methods
+        "model__min_samples_split": [2, 3, 5],         # 2 values
+        "model__min_samples_leaf": [1, 2, 3, 4],          # 2 values
+        "model__max_features": ['sqrt'],    # 2 feature selection methods
     }
 
     # param_grid = {
@@ -98,9 +98,11 @@ def generate_neural_network(train_df, test_df, RANDOM_STATE):
 
     # Network architectures to try
     hidden_layer_sizes_grid = [
-        (100,),           # 1 layer
-        (100, 50),        # 2 layers
-        (100, 50, 25),    # 3 layers
+            (64,),            # Simpler
+            (100,),
+            (50, 50),         # Your idea ✓
+            (100, 50),        # Gradual reduction
+            (64, 32),         # Pyramid shape
     ]
     
     # Other hyperparameters (reduced for efficiency)
@@ -128,15 +130,12 @@ def generate_svm(train_df, test_df, RANDOM_STATE):
     target_col = "y"
     predictors = [c for c in train_df.columns if c != target_col]
     
-    # SVM Hyperparameters:
-    # - kernel: 'rbf' (flexible, non-linear) vs 'linear' (faster, good for high-dim)
+    # LinearSVC Hyperparameters (FAST - O(n) complexity):
     # - C: Regularization (higher = tighter fit, risk overfitting)
-    # - gamma: Kernel coefficient (higher = complex boundaries)
-    # Grid: 2 * 4 * 3 = 24 combos (reasonable)
+    # No kernel or gamma for LinearSVC - it's always linear
+    # Grid: 4 values = 4 combos (very fast!)
     param_grid = {
-        "model__kernel": ['rbf', 'linear'],
-        "model__C": [1, 10, 100],
-        "model__gamma": ['scale', 0.1],  # ignored for linear kernel
+        "model__C": [0.1, 1, 10, 100],
     }
 
     results = run_svm_experiment(

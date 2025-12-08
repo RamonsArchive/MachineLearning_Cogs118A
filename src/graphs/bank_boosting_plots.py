@@ -29,7 +29,7 @@ def plot_bank_boosting_summary(results_boosting, save_dir):
     os.makedirs(save_dir, exist_ok=True)
 
     # ------------------------------------------------------------------
-    # 1. Accuracy vs split (mean over 3 trials)
+    # 1. ROC-AUC vs split (mean over 3 trials) - ALL metrics are ROC-AUC
     # ------------------------------------------------------------------
     split_names = []
     mean_train = []
@@ -42,24 +42,24 @@ def plot_bank_boosting_summary(results_boosting, save_dir):
     for split_name, trials in results_boosting.items():
         split_names.append(split_name)
 
-        train_scores = [t["cv_train_score"] for t in trials]
-        val_scores = [t["cv_val_score"] for t in trials]
-        test_accs = [t["test_accuracy"] for t in trials]
+        train_scores = [t["cv_train_score"] for t in trials]  # ROC-AUC
+        val_scores = [t["cv_val_score"] for t in trials]      # ROC-AUC
+        test_roc_aucs = [t["test_metrics"]["roc_auc"] for t in trials]  # ROC-AUC (consistent!)
 
         mean_train.append(np.mean(train_scores))
         mean_val.append(np.mean(val_scores))
-        mean_test.append(np.mean(test_accs))
+        mean_test.append(np.mean(test_roc_aucs))
 
-        # Track best test accuracy across all splits/trials
+        # Track best test ROC-AUC across all splits/trials
         for idx, t in enumerate(trials):
-            if best_model is None or t["test_accuracy"] > best_model["record"]["test_accuracy"]:
+            if best_model is None or t["test_metrics"]["roc_auc"] > best_model["record"]["test_metrics"]["roc_auc"]:
                 best_model = {
                     "split_name": split_name,
                     "trial_index": idx,
                     "record": t,
                 }
 
-    # Plot accuracy vs split
+    # Plot ROC-AUC vs split
     x = np.arange(len(split_names))
 
     plt.figure()
@@ -67,8 +67,8 @@ def plot_bank_boosting_summary(results_boosting, save_dir):
     plt.plot(split_names, mean_val, marker="o", label="Validation (CV mean)")
     plt.plot(split_names, mean_test, marker="o", label="Test (mean of trials)")
     plt.xlabel("Train/Test split")
-    plt.ylabel("Accuracy")
-    plt.title("Bank Dataset – Boosting accuracy vs split")
+    plt.ylabel("ROC-AUC")
+    plt.title("Bank Dataset – Boosting ROC-AUC vs split")
     plt.legend()
     plt.tight_layout()
     plt.savefig(os.path.join(save_dir, "bank_boosting_accuracy.png"), bbox_inches="tight")
@@ -142,7 +142,7 @@ def plot_bank_boosting_summary(results_boosting, save_dir):
         f.write("Bank Dataset – Boosting Summary Report\n")
         f.write("======================================\n\n")
 
-        f.write("Mean accuracy by split (averaged over 3 trials):\n")
+        f.write("Mean ROC-AUC by split (averaged over 3 trials):\n")
         for i, split_name in enumerate(split_names):
             f.write(
                 f"  Split {split_name}: "
@@ -159,7 +159,7 @@ def plot_bank_boosting_summary(results_boosting, save_dir):
             idx = best_model["trial_index"]
             rec = best_model["record"]
 
-            f.write("\nBest model (by test accuracy):\n")
+            f.write("\nBest model (by test ROC-AUC):\n")
             f.write(f"  Split: {split_name}\n")
             f.write(f"  Trial index: {idx}\n")
             f.write(f"  Best params: {rec.get('best_params', {})}\n")

@@ -39,7 +39,7 @@ def plot_bank_neural_network_summary(results_nn, save_dir):
     os.makedirs(save_dir, exist_ok=True)
 
     # ------------------------------------------------------------------
-    # 1. Accuracy vs split (mean over 3 trials)
+    # 1. ROC-AUC vs split (mean over 3 trials) - ALL metrics are ROC-AUC
     # ------------------------------------------------------------------
     split_names = []
     mean_train = []
@@ -52,24 +52,24 @@ def plot_bank_neural_network_summary(results_nn, save_dir):
     for split_name, trials in results_nn.items():
         split_names.append(split_name)
 
-        train_scores = [t["cv_train_score"] for t in trials]
-        val_scores = [t["cv_val_score"] for t in trials]
-        test_accs = [t["test_accuracy"] for t in trials]
+        train_scores = [t["cv_train_score"] for t in trials]  # ROC-AUC
+        val_scores = [t["cv_val_score"] for t in trials]      # ROC-AUC
+        test_roc_aucs = [t["test_metrics"]["roc_auc"] for t in trials]  # ROC-AUC (consistent!)
 
         mean_train.append(np.mean(train_scores))
         mean_val.append(np.mean(val_scores))
-        mean_test.append(np.mean(test_accs))
+        mean_test.append(np.mean(test_roc_aucs))
 
-        # Track best test accuracy across all splits/trials
+        # Track best test ROC-AUC across all splits/trials
         for idx, t in enumerate(trials):
-            if best_model is None or t["test_accuracy"] > best_model["record"]["test_accuracy"]:
+            if best_model is None or t["test_metrics"]["roc_auc"] > best_model["record"]["test_metrics"]["roc_auc"]:
                 best_model = {
                     "split_name": split_name,
                     "trial_index": idx,
                     "record": t,
                 }
 
-    # Plot accuracy vs split
+    # Plot ROC-AUC vs split
     plt.figure(figsize=(8, 5))
     plt.plot(split_names, mean_train, marker="o", linewidth=2, markersize=8, label="Train (CV mean)")
     plt.plot(split_names, mean_val, marker="s", linewidth=2, markersize=8, label="Validation (CV mean)")
@@ -177,7 +177,7 @@ def plot_bank_neural_network_summary(results_nn, save_dir):
         bars = plt.barh(range(len(arch_names)), arch_means, xerr=arch_stds, 
                        color="#7c3aed", alpha=0.8, capsize=3)
         plt.yticks(range(len(arch_names)), arch_names, fontsize=9)
-        plt.xlabel("Mean Test Accuracy", fontsize=11)
+        plt.xlabel("Mean Test ROC-AUC", fontsize=11)
         plt.title("Bank Dataset – Neural Network Architecture Comparison", fontsize=12)
         plt.grid(True, axis='x', alpha=0.3)
         plt.tight_layout()
@@ -226,7 +226,7 @@ def plot_bank_neural_network_summary(results_nn, save_dir):
             idx = best_model["trial_index"]
             rec = best_model["record"]
 
-            f.write("BEST MODEL (by test accuracy)\n")
+            f.write("BEST MODEL (by test ROC-AUC)\n")
             f.write("-" * 70 + "\n")
             f.write(f"Split: {split_name}\n")
             f.write(f"Trial: {idx}\n")

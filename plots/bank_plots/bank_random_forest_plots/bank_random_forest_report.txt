@@ -12,21 +12,21 @@ PERFORMANCE BY SPLIT (averaged over 3 trials)
 ----------------------------------------------------------------------
 Split        Train (CV)      Val (CV)        Test           
 ----------------------------------------------------------------------
-20_80        0.9157          0.7986          0.8987         
-50_50        0.8719          0.7992          0.9010         
-80_20        0.8527          0.7994          0.9020         
+20_80        0.9014          0.8001          0.8989         
+50_50        0.8685          0.7993          0.9008         
+80_20        0.8448          0.7999          0.9024         
 
 OVERFITTING ANALYSIS
 ----------------------------------------------------------------------
 Split 20_80:
-  Train-Val gap: +0.1171 (>0.05 suggests overfitting)
-  Val-Test gap:  -0.1001 (large gap = CV overestimates performance)
+  Train-Val gap: +0.1013 (>0.05 suggests overfitting)
+  Val-Test gap:  -0.0988 (large gap = CV overestimates performance)
 Split 50_50:
-  Train-Val gap: +0.0727 (>0.05 suggests overfitting)
-  Val-Test gap:  -0.1018 (large gap = CV overestimates performance)
+  Train-Val gap: +0.0691 (>0.05 suggests overfitting)
+  Val-Test gap:  -0.1014 (large gap = CV overestimates performance)
 Split 80_20:
-  Train-Val gap: +0.0533 (>0.05 suggests overfitting)
-  Val-Test gap:  -0.1026 (large gap = CV overestimates performance)
+  Train-Val gap: +0.0449 (>0.05 suggests overfitting)
+  Val-Test gap:  -0.1025 (large gap = CV overestimates performance)
 
 BEST MODEL (by test accuracy)
 ----------------------------------------------------------------------
@@ -36,26 +36,26 @@ Trial: 1
 Best Hyperparameters:
   max_depth: 10
   max_features: sqrt
-  min_samples_leaf: 1
+  min_samples_leaf: 2
   min_samples_split: 2
-  n_estimators: 1000
+  n_estimators: 200
 
 Test Set Metrics:
 ----------------------------------------
-  Accuracy:  0.9034
-  Precision: 0.7025
-  Recall:    0.2468
-  F1-Score:  0.3652
-  ROC-AUC:   0.7897
+  Accuracy:  0.9035
+  Precision: 0.7085
+  Recall:    0.2435
+  F1-Score:  0.3625
+  ROC-AUC:   0.7896
 
-(ROC-AUC from ROC curve plot: 0.7897)
+(ROC-AUC from ROC curve plot: 0.7896)
 
 Detailed Classification Report (Test Set):
 ----------------------------------------
               precision    recall  f1-score   support
 
       No (0)       0.91      0.99      0.95      7310
-     Yes (1)       0.70      0.25      0.37       928
+     Yes (1)       0.71      0.24      0.36       928
 
     accuracy                           0.90      8238
    macro avg       0.81      0.62      0.66      8238
@@ -63,16 +63,16 @@ weighted avg       0.89      0.90      0.88      8238
 
 Top 10 Most Important Features:
 ----------------------------------------
-   1. euribor3m                      0.1639
-   2. nr.employed                    0.1521
-   3. pdays                          0.0829
-   4. poutcome_success               0.0756
-   5. emp.var.rate                   0.0676
-   6. cons.conf.idx                  0.0619
-   7. cons.price.idx                 0.0543
-   8. age                            0.0463
-   9. previous                       0.0253
-  10. contact_cellular               0.0149
+   1. euribor3m                      0.1645
+   2. nr.employed                    0.1372
+   3. poutcome_success               0.0893
+   4. pdays                          0.0877
+   5. emp.var.rate                   0.0783
+   6. cons.conf.idx                  0.0604
+   7. cons.price.idx                 0.0581
+   8. age                            0.0439
+   9. previous                       0.0274
+  10. poutcome_failure               0.0157
 
 ======================================================================
 END OF REPORT
