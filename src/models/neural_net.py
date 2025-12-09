@@ -17,7 +17,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler, LabelEncoder
 
 from sklearn.neural_network import MLPClassifier, MLPRegressor
-from sklearn.model_selection import GridSearchCV, StratifiedKFold
+from sklearn.model_selection import GridSearchCV, StratifiedKFold, KFold
 
 from sklearn.metrics import (
     accuracy_score,
@@ -210,9 +210,12 @@ def run_neural_net_experiment(
         scoring = "neg_mean_squared_error"
 
     # =========================
-    # 4. Grid search (10-fold CV) on TRAIN ONLY
+    # 4. Grid search (5-fold CV) on TRAIN ONLY
     # =========================
-    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=random_state)  # Stratified for imbalanced data
+    if problem_type == "classification":
+        cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=random_state)
+    else:
+        cv = KFold(n_splits=5, shuffle=True, random_state=random_state)
 
     # Calculate total combinations for logging
     total_combos = 1

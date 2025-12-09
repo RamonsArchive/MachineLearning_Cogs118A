@@ -1,0 +1,108 @@
+======================================================================
+FACE TEMPERATURE DATASET - EXPLORATORY DATA ANALYSIS
+======================================================================
+
+Task: REGRESSION (Predict Oral Temperature)
+Target Variable: OralTemp
+
+--------------------------------------------------
+DATASET OVERVIEW
+--------------------------------------------------
+Total samples: 1001
+Total features: 63
+Numeric features: 60
+Categorical features: 3
+
+--------------------------------------------------
+TARGET VARIABLE STATISTICS (OralTemp)
+--------------------------------------------------
+Mean: 37.0004°C
+Std:  0.4715°C
+Min:  35.6400°C
+25%:  36.7500°C
+50%:  36.9000°C
+75%:  37.1000°C
+Max:  40.3400°C
+
+--------------------------------------------------
+NAIVE BASELINE PERFORMANCE
+--------------------------------------------------
+
+For regression, naive baselines predict a constant value:
+  - Mean Predictor: Always predict the mean of target
+  - Median Predictor: Always predict the median of target
+
+1. MEAN PREDICTOR (predict mean = 37.0004°C):
+   MSE:  0.222071
+   RMSE: 0.471244°C
+   MAE:  0.297462°C
+   R²:   0.000000 (always 0 for mean predictor)
+
+2. MEDIAN PREDICTOR (predict median = 36.9000°C):
+   MSE:  0.232159
+   RMSE: 0.481829°C
+   MAE:  0.286054°C
+   R²:   -0.045427
+
+--------------------------------------------------
+BASELINE INTERPRETATION
+--------------------------------------------------
+
+A good model should achieve:
+  - RMSE < 0.4712°C (beat mean predictor)
+  - MAE  < 0.2975°C (beat mean predictor)
+  - R²   > 0 (explain some variance)
+
+Typical 'good' regression performance:
+  - R² > 0.5 (explains 50%+ of variance)
+  - R² > 0.7 (good model)
+  - R² > 0.9 (excellent model)
+
+--------------------------------------------------
+TOP CORRELATED FEATURES WITH TARGET
+--------------------------------------------------
+
+Top 10 Positive Correlations:
+  avg_T_Max_ici: 0.8170
+  avg_T_Max_flir: 0.8158
+  avg_canthiMax_ici: 0.7607
+  avg_canthi4Max_ici: 0.7604
+  avg_canthiMax_flir: 0.7480
+  avg_canthi4Max_flir: 0.7475
+  avg_T_OR_flir: 0.7472
+  avg_T_OR_Max_flir: 0.7467
+  avg_T_RC_Max_ici: 0.7421
+  avg_T_RC_ici: 0.7420
+
+Top 5 Negative Correlations:
+  avg_T_offset_ici: -0.0447
+  Distance_ici: 0.0119
+  Distance_flir: 0.0119
+  Humidity_flir: 0.0497
+  Humidity_ici: 0.0694
+
+--------------------------------------------------
+CATEGORICAL FEATURE ANALYSIS
+--------------------------------------------------
+
+Gender - Mean OralTemp by category:
+  Female: 36.9545°C (±0.3295, n=595)
+  Male: 37.0678°C (±0.6180, n=406)
+
+Age - Mean OralTemp by category:
+  18-20: 37.0174°C (±0.5151, n=521)
+  21-25: 37.0153°C (±0.4531, n=350)
+  21-30: 36.9770°C (±0.3907, n=10)
+  26-30: 36.8785°C (±0.2254, n=66)
+  31-40: 36.9503°C (±0.3577, n=31)
+  41-50: 36.8933°C (±0.2677, n=9)
+  51-60: 36.7418°C (±0.3444, n=11)
+  >60: 36.8600°C (±0.3342, n=3)
+
+Ethnicity - Mean OralTemp by category:
+  American Indian or Alaskan Native: 36.7950°C (±0.2805, n=4)
+  Asian: 36.9269°C (±0.4069, n=255)
+  Black or African-American: 37.0002°C (±0.5001, n=142)
+  Hispanic/Latino: 37.0171°C (±0.3952, n=55)
+  Multiracial: 37.0250°C (±0.6014, n=50)
+  White: 37.0357°C (±0.4853, n=495)

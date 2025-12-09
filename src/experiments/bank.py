@@ -32,18 +32,23 @@ NEURAL_NETWORK_NAME = "neural_network"
 SVM_NAME = "svm"
 
 def generate_boosting(train_df, test_df, RANDOM_STATE):
+    """
+    Run XGBoost classification experiment.
+    XGBoost replaces sklearn GradientBoosting (same algorithm, faster, better regularization).
+    """
     target_col = "y"
     predictors = [c for c in train_df.columns if c != target_col]
+    
+    # XGBoost hyperparameters (compatible with old grid + new XGBoost features)
     param_grid = {
-        "model__n_estimators": [300, 600, 1000, 1200, 2000],
-        "model__learning_rate": [0.005, 0.01, 0.03, 0.1],
-        "model__max_depth": [1, 2, 3, 5, 7, 9],
+        "model__n_estimators": [100, 200, 300],
+        "model__learning_rate": [0.01, 0.05, 0.1],
+        "model__max_depth": [3, 5, 7],
+        "model__subsample": [0.8, 1.0],
+        "model__scale_pos_weight": [1, 3, 5],  # For imbalanced classes (helps recall!)
+        "model__reg_alpha": [0, 0.1],          # L1 regularization
+        "model__reg_lambda": [1, 10],          # L2 regularization
     }
-    # param_grid = {
-    #     "model__n_estimators": [1200],
-    #     "model__learning_rate": [0.01],
-    #     "model__max_depth": [2],
-    # }
 
     results = run_boosting_experiment(
         train_df=train_df,
@@ -64,10 +69,10 @@ def generate_random_forest(train_df, test_df, RANDOM_STATE):
     # Reduced grid for efficiency (72 combos vs 288)
     # Random Forest is robust; fewer hyperparams often sufficient
     param_grid = {
-        "model__n_estimators": [200, 300, 500, 1000],    # fewer trees still effective
-        "model__max_depth": [10, 20, None],         # 3 depths
-        "model__min_samples_split": [2, 3, 5],         # 2 values
-        "model__min_samples_leaf": [1, 2, 3, 4],          # 2 values
+        "model__n_estimators": [200, 300, 500, 800],    # fewer trees still effective
+        "model__max_depth": [8, 10, 12, 16, None],         # 3 depths
+        "model__min_samples_split": [2, 3, 5, 10],         # 2 values
+        "model__min_samples_leaf": [2, 4, 6, 8],          # 2 values
         "model__max_features": ['sqrt'],    # 2 feature selection methods
     }
 
@@ -101,8 +106,8 @@ def generate_neural_network(train_df, test_df, RANDOM_STATE):
             (64,),            # Simpler
             (100,),
             (50, 50),         # Your idea ✓
-            (100, 50),        # Gradual reduction
             (64, 32),         # Pyramid shape
+            (100, 50),        # Gradual reduction
     ]
     
     # Other hyperparameters (reduced for efficiency)
@@ -329,20 +334,22 @@ def main():
         json.dump(results, f, indent=2)
     print(f"\n[bank.py] Saved all results to {out_path}")
 
+    base_plots_dir = os.path.join(curr_dir, "../..", "plots/bank_plots/results")
+
     # # Plot Boosting results
-    boosting_plots_dir = os.path.join(curr_dir, "../..", "plots/bank_plots", "bank_boosting_plots")
+    boosting_plots_dir = os.path.join(base_plots_dir,"boosting")
     plot_bank_boosting_summary(results[BOOSTING_NAME], boosting_plots_dir)
     
     # Plot Random Forest results
-    rf_plots_dir = os.path.join(curr_dir, "../..", "plots/bank_plots", "bank_random_forest_plots")
+    rf_plots_dir = os.path.join(base_plots_dir, "random_forest")
     plot_bank_random_forest_summary(results[RANDOM_FOREST_NAME], rf_plots_dir)
     
     # Plot Neural Network results
-    nn_plots_dir = os.path.join(curr_dir, "../..", "plots/bank_plots", "bank_neural_network_plots")
+    nn_plots_dir = os.path.join(base_plots_dir, "neural_network")
     plot_bank_neural_network_summary(results[NEURAL_NETWORK_NAME], nn_plots_dir)
     
     # Plot SVM results
-    svm_plots_dir = os.path.join(curr_dir, "../..", "plots/bank_plots", "bank_svm_plots")
+    svm_plots_dir = os.path.join(base_plots_dir, "svm")
     plot_bank_svm_summary(results[SVM_NAME], svm_plots_dir)
 
 

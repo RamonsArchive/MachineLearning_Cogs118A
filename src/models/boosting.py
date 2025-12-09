@@ -1,4 +1,24 @@
 # src/models/boosting.py
+"""
+XGBoost - Extreme Gradient Boosting
+
+Replaces sklearn's GradientBoosting with XGBoost (faster, better regularization).
+
+XGBoost vs sklearn GradientBoosting:
+- Same algorithm (gradient boosting)
+- 2-10x faster (parallelized)
+- Built-in L1 (reg_alpha) and L2 (reg_lambda) regularization
+- Better handling of missing values
+
+Key Hyperparameters:
+- n_estimators: Number of boosting rounds
+- learning_rate (eta): Shrinkage rate (0.01-0.3)
+- max_depth: Tree depth (3-10 typical)
+- subsample: Row sampling (0.5-1.0)
+- colsample_bytree: Column sampling (0.5-1.0)
+- reg_alpha: L1 regularization (default 0)
+- reg_lambda: L2 regularization (default 1)
+"""
 
 import numpy as np
 import pandas as pd
@@ -6,10 +26,10 @@ import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler, LabelEncoder
-
-from sklearn.ensemble import GradientBoostingClassifier, GradientBoostingRegressor
-from sklearn.model_selection import GridSearchCV, StratifiedKFold
+from sklearn.model_selection import GridSearchCV, KFold, StratifiedKFold
 from sklearn.utils.class_weight import compute_sample_weight
+
+from xgboost import XGBRegressor, XGBClassifier
 
 from sklearn.metrics import (
     accuracy_score,
@@ -24,13 +44,7 @@ from sklearn.metrics import (
 
 
 def _build_preprocessing_and_model(num_cols, cat_cols, problem_type, random_state):
-    """
-    Create a preprocessing + model pipeline.
-
-    - num_cols -> StandardScaler
-    - cat_cols -> OneHotEncoder
-    - model   -> GradientBoostingClassifier or Regressor
-    """
+    """Create preprocessing + XGBoost pipeline."""
     preprocessor = ColumnTransformer(
         transformers=[
             ("num", StandardScaler(), num_cols),
@@ -39,9 +53,18 @@ def _build_preprocessing_and_model(num_cols, cat_cols, problem_type, random_stat
     )
 
     if problem_type == "classification":
-        model = GradientBoostingClassifier(random_state=random_state)
+        model = XGBClassifier(
+            random_state=random_state,
+            n_jobs=-1,
+            eval_metric='logloss',
+            verbosity=0,
+        )
     elif problem_type == "regression":
-        model = GradientBoostingRegressor(random_state=random_state)
+        model = XGBRegressor(
+            random_state=random_state,
+            n_jobs=-1,
+            verbosity=0,
+        )
     else:
         raise ValueError(f"Unsupported problem_type: {problem_type}")
 
@@ -58,18 +81,17 @@ def run_boosting_experiment(
     test_df: pd.DataFrame,
     predictors: list,
     target_col: str,
-    problem_type: str = "classification",   # or "regression"
+    problem_type: str = "classification",
     random_state: int = 42,
     param_grid: dict | None = None,
 ):
     """
-    Generic boosting experiment:
-    - Uses ONLY train_df for GridSearchCV (10-fold)
-    - Refits best model on full train_df
-    - Evaluates once on held-out test_df
-    - Returns dict with model, best params, CV summary, and test metrics
+    Run XGBoost experiment (classification or regression).
+    
+    XGBoost has built-in regularization:
+    - reg_alpha: L1 regularization (default 0)
+    - reg_lambda: L2 regularization (default 1)
     """
-
     np.random.seed(random_state)
 
     # =========================
@@ -81,7 +103,7 @@ def run_boosting_experiment(
     y_train_raw = train_df[target_col].copy()
     y_test_raw = test_df[target_col].copy()
 
-    # For classification, encode labels to 0/1 (or 0..K-1)
+    # For classification, encode labels
     label_encoder = None
     if problem_type == "classification":
         label_encoder = LabelEncoder()
@@ -109,23 +131,39 @@ def run_boosting_experiment(
     # 3. Define hyperparameter grid
     # =========================
     if param_grid is None:
-        # Reasonable defaults; you can override from experiments/bank.py
-        param_grid = {
-            "model__n_estimators": [100, 200, 300],
-            "model__learning_rate": [0.05, 0.1],
-            "model__max_depth": [1, 3],
-        }
+        if problem_type == "regression":
+            param_grid = {
+                "model__n_estimators": [100, 200],
+                "model__learning_rate": [0.05, 0.1],
+                "model__max_depth": [3, 5],
+                "model__subsample": [0.8, 1.0],
+                "model__reg_alpha": [0, 0.1],
+                "model__reg_lambda": [1, 10],
+            }
+        else:  # classification
+            param_grid = {
+                "model__n_estimators": [100, 200],
+                "model__learning_rate": [0.05, 0.1],
+                "model__max_depth": [3, 5],
+                "model__subsample": [0.8, 1.0],
+                "model__scale_pos_weight": [1, 3],  # For imbalanced classes
+                "model__reg_alpha": [0, 0.1],
+                "model__reg_lambda": [1, 10],
+            }
 
     # Choose scoring
     if problem_type == "classification":
-        scoring = "f1"  # Optimizes for balance of precision AND recall
+        scoring = "f1"
     else:
         scoring = "neg_mean_squared_error"
 
     # =========================
-    # 4. Grid search (10-fold CV) on TRAIN ONLY
+    # 4. Grid search CV
     # =========================
-    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=random_state)  # Stratified for imbalanced data
+    if problem_type == "classification":
+        cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=random_state)
+    else:
+        cv = KFold(n_splits=5, shuffle=True, random_state=random_state)
 
     grid_search = GridSearchCV(
         estimator=pipeline,
@@ -133,74 +171,41 @@ def run_boosting_experiment(
         cv=cv,
         scoring=scoring,
         n_jobs=-1,
-        refit=True,       # refit best model on full train set
+        refit=True,
         verbose=1,
         return_train_score=True,
     )
 
-    print("\n=== GRID SEARCH: Gradient Boosting ===")
+    print(f"\n=== GRID SEARCH: XGBOOST ({problem_type}) ===")
     print(f"Training samples: {len(X_train)}")
-    print(f"Hyperparameter combinations: "
-          f"{len(param_grid['model__n_estimators']) * len(param_grid['model__learning_rate']) * len(param_grid['model__max_depth'])}")
-    print("Fitting GridSearchCV (10-fold CV on TRAIN ONLY)...")
-    print("Using class-balanced sample weights to improve recall on minority class.")
+    print("XGBoost has built-in L1 (reg_alpha) and L2 (reg_lambda) regularization")
+    print("Fitting GridSearchCV...")
 
-    # Compute sample weights to penalize missing minority class more
-    if problem_type == "classification":
-        sample_weights = compute_sample_weight('balanced', y_train)
-        grid_search.fit(X_train, y_train, model__sample_weight=sample_weights)
-    else:
-        grid_search.fit(X_train, y_train)
+    grid_search.fit(X_train, y_train)
 
     best_estimator = grid_search.best_estimator_
     best_params = grid_search.best_params_
-    best_cv_score = grid_search.best_score_          # mean val score across folds
+    best_cv_score = grid_search.best_score_
     best_index = grid_search.best_index_
-    best_cv_std = grid_search.cv_results_["std_test_score"][best_index]
 
-     # Mean train/val scores for the best hyperparameter combo
     cv_train_score = grid_search.cv_results_["mean_train_score"][best_index]
     cv_val_score = grid_search.cv_results_["mean_test_score"][best_index]
 
     print("\n=== GRID SEARCH COMPLETE ===")
     print("Best params:", best_params)
-    print(f"Best CV score ({scoring}): {best_cv_score:.4f} ± {best_cv_std:.4f}")
+    print(f"Best CV score ({scoring}): {best_cv_score:.4f}")
 
     # =========================
-    # 5. Train metrics (overfitting check)
+    # 5. Evaluate on TEST set
     # =========================
-    # best_estimator is already refit on ALL train data
-    y_train_pred = best_estimator.predict(X_train)
-
-    train_metrics = {}
-    if problem_type == "classification":
-        train_metrics["accuracy"] = accuracy_score(y_train, y_train_pred)
-        train_metrics["precision"] = precision_score(y_train, y_train_pred, zero_division=0)
-        train_metrics["recall"] = recall_score(y_train, y_train_pred, zero_division=0)
-        train_metrics["f1"] = f1_score(y_train, y_train_pred, zero_division=0)
-    else:
-        train_mse = mean_squared_error(y_train, y_train_pred)
-        train_rmse = np.sqrt(train_mse)
-        train_mae = mean_absolute_error(y_train, y_train_pred)
-        train_r2 = r2_score(y_train, y_train_pred)
-        train_metrics.update({
-            "mse": train_mse,
-            "rmse": train_rmse,
-            "mae": train_mae,
-            "r2": train_r2,
-        })
-
-    # =========================
-    # 6. Evaluate on held-out TEST set
-    # =========================
-    print("\n=== EVALUATING ON TEST SET (HELD-OUT) ===")
+    print("\n=== EVALUATING ON TEST SET ===")
     y_pred = best_estimator.predict(X_test)
 
     test_metrics = {}
-    y_proba = None   # <= will store probabilities for ROC curve
+    y_proba = None
 
     if problem_type == "classification":
-        # If classifier supports predict_proba, compute AUC + keep scores for ROC curve
+        # Get probabilities for ROC
         if hasattr(best_estimator.named_steps["model"], "predict_proba"):
             y_proba = best_estimator.predict_proba(X_test)[:, 1]
             try:
@@ -237,27 +242,34 @@ def run_boosting_experiment(
         print(f"Test MAE : {mae:.4f}")
 
     # =========================
-    # 7. Pack results in a dict
+    # 6. Get feature importances
+    # =========================
+    xgb_model = best_estimator.named_steps["model"]
+    feature_importances = xgb_model.feature_importances_
+    
+    try:
+        preprocessor = best_estimator.named_steps["preprocessor"]
+        feature_names = preprocessor.get_feature_names_out().tolist()
+    except AttributeError:
+        feature_names = None
+
+    # =========================
+    # 7. Pack results
     # =========================
     results = {
         "model": best_estimator,
         "best_params": best_params,
-
-        # CV info
-        "cv_primary_metric": best_cv_score,   # same as best_cv_score
         "cv_scoring": scoring,
-        "cv_train_score": float(cv_train_score),  # mean train score for best params
-        "cv_val_score": float(cv_val_score),      # mean val score for best params
+        "cv_train_score": float(cv_train_score),
+        "cv_val_score": float(cv_val_score),
         "grid_search": grid_search,
-
-        # Test metrics & outputs
         "test_metrics": test_metrics,
         "y_test": y_test,
         "y_pred": y_pred,
         "y_proba": y_proba,
         "y_test_raw": y_test_raw,
-
-        # Meta
+        "feature_importances": feature_importances,
+        "feature_names": feature_names,
         "predictors": predictors,
         "target_col": target_col,
         "problem_type": problem_type,

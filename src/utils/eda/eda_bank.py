@@ -6,7 +6,7 @@ from io import StringIO
 
 def eda_bank(data):
     # Create eda_plots directory if it doesn't exist
-    output_dir = "plots/eda_plots"
+    output_dir = "plots/bank_plots/eda"
     os.makedirs(output_dir, exist_ok=True)
 
     df = data.copy()
