@@ -1,0 +1,94 @@
+======================================================================
+PARKINSON'S TELEMONITORING - EXPLORATORY DATA ANALYSIS
+======================================================================
+
+Task: REGRESSION (Predict UPDRS Score from Voice Features)
+Target Variable: total_UPDRS
+
+UPDRS = Unified Parkinson's Disease Rating Scale
+Higher score = More severe symptoms
+
+--------------------------------------------------
+DATASET OVERVIEW
+--------------------------------------------------
+Total voice recordings: 5875
+Unique patients: 42
+Recordings per patient: ~139
+Total features: 19
+Voice features: 16 (Jitter, Shimmer, NHR, HNR, etc.)
+Demographics: age, sex, test_time
+
+--------------------------------------------------
+TARGET VARIABLE STATISTICS (total_UPDRS)
+--------------------------------------------------
+Mean:  29.0189
+Std:   10.7003
+Min:   7.0000
+25%:   21.3710
+50%:   27.5760
+75%:   36.3990
+Max:   54.9920
+
+(Alternative target: motor_UPDRS)
+Mean: 21.2962, Std: 8.1293, Range: [5.04, 39.51]
+
+--------------------------------------------------
+NAIVE BASELINE PERFORMANCE
+--------------------------------------------------
+
+Mean Predictor (always predict mean UPDRS):
+  MSE:  114.4766
+  RMSE: 10.6994
+  MAE:  8.6559
+  R2:   0.0000 (by definition)
+
+A good model should achieve:
+  RMSE < 10.70 (beat mean predictor)
+  R2 > 0.3 for moderate performance
+  R2 > 0.5 for good performance
+
+--------------------------------------------------
+TOP CORRELATED FEATURES WITH total_UPDRS
+--------------------------------------------------
+
+Top 10 Features (by absolute correlation):
+  age: +0.3103
+  HNR: -0.1621
+  RPDE: +0.1569
+  PPE: +0.1562
+  Shimmer:APQ11: +0.1208
+  DFA: -0.1135
+  Shimmer(dB): +0.0988
+  sex: -0.0966
+  Shimmer: +0.0921
+  Shimmer:APQ5: +0.0835
+
+--------------------------------------------------
+VOICE FEATURE GROUPS
+--------------------------------------------------
+
+JITTER (pitch instability):
+  - Jitter(%), Jitter(Abs), Jitter:RAP, Jitter:PPQ5, Jitter:DDP
+  - Higher = more pitch variation = worse motor control
+
+SHIMMER (loudness instability):
+  - Shimmer, Shimmer(dB), Shimmer:APQ3/5/11, Shimmer:DDA
+  - Higher = more amplitude variation = worse motor control
+
+NOISE RATIOS:
+  - NHR: Noise-to-Harmonics Ratio (higher = worse voice quality)
+  - HNR: Harmonics-to-Noise Ratio (higher = better voice quality)
+
+COMPLEXITY MEASURES:
+  - RPDE: Recurrence Period Density Entropy
+  - DFA: Detrended Fluctuation Analysis (fractal scaling)
+  - PPE: Pitch Period Entropy
+    
+
+--------------------------------------------------
+DEMOGRAPHICS
+--------------------------------------------------
+
+Age: mean=64.8, range=[36, 85]
+Sex: 4008 male (0), 1867 female (1)
+Test time: mean=92.9 days, max=215.5 days

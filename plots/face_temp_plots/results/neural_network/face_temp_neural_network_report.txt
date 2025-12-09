@@ -1,0 +1,38 @@
+======================================================================
+FACE TEMPERATURE REGRESSION - NEURAL_NETWORK RESULTS
+======================================================================
+
+--------------------------------------------------
+PERFORMANCE BY SPLIT (averaged over 3 trials)
+--------------------------------------------------
+
+Split      CV Train     CV Val       Test R2      Test RMSE    Test MAE    
+----------------------------------------------------------------------
+20_80      -2.0266      -226.4903      -121173.2224      163.8059       7.1540
+50_50      -6.8462      -10933.8586      -7107.8188      28.1943       2.7510
+80_20      -1.2711      -8464.6529      0.2462      0.3941       0.2812
+
+--------------------------------------------------
+BEST MODEL (highest R2)
+--------------------------------------------------
+Split: 80_20
+Trial: 3
+
+Best Parameters:
+  model__alpha: 0.0001
+  model__batch_size: 32
+  model__hidden_layer_sizes: (64,)
+  model__learning_rate_init: 0.001
+
+Test Metrics:
+  R2:   0.4101
+  RMSE: 0.3912 degC
+  MAE:  0.2931 degC
+  MSE:  0.153074
+
+--------------------------------------------------
+INTERPRETATION
+--------------------------------------------------
+Model Quality: POOR (R2 = 0.4101)
+The model explains 41.0% of variance in oral temperature.
+Average prediction error: +/- 0.293 degC

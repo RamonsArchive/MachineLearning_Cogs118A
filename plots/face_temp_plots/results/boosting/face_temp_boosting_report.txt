@@ -1,0 +1,41 @@
+======================================================================
+FACE TEMPERATURE REGRESSION - BOOSTING RESULTS
+======================================================================
+
+--------------------------------------------------
+PERFORMANCE BY SPLIT (averaged over 3 trials)
+--------------------------------------------------
+
+Split      CV Train     CV Val       Test R2      Test RMSE    Test MAE    
+----------------------------------------------------------------------
+20_80      -0.0086      -0.0733      0.6615      0.2737       0.1937
+50_50      -0.0229      -0.0621      0.7204      0.2433       0.1770
+80_20      -0.0238      -0.0582      0.7332      0.2328       0.1741
+
+--------------------------------------------------
+BEST MODEL (highest R2)
+--------------------------------------------------
+Split: 80_20
+Trial: 3
+
+Best Parameters:
+  model__colsample_bytree: 1.0
+  model__learning_rate: 0.05
+  model__max_depth: 3
+  model__n_estimators: 100
+  model__reg_alpha: 0
+  model__reg_lambda: 1
+  model__subsample: 0.8
+
+Test Metrics:
+  R2:   0.8021
+  RMSE: 0.2266 degC
+  MAE:  0.1725 degC
+  MSE:  0.051359
+
+--------------------------------------------------
+INTERPRETATION
+--------------------------------------------------
+Model Quality: GOOD (R2 = 0.8021)
+The model explains 80.2% of variance in oral temperature.
+Average prediction error: +/- 0.172 degC

@@ -83,8 +83,8 @@ def generate_random_forest(train_df, test_df, random_state, predictors, target_c
     
     # Hyperparameter grid for RF regression
     param_grid = {
-        "model__n_estimators": [100, 200],
-        "model__max_depth": [10, 20, None],
+        "model__n_estimators": [50, 100, 200, 300],
+        "model__max_depth": [1, 3, 10, 20, None],
         "model__min_samples_split": [2, 5],
         "model__min_samples_leaf": [1, 2],
         "model__max_features": ["sqrt", 0.5],

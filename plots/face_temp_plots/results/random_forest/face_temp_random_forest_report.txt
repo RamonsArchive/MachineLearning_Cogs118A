@@ -1,0 +1,39 @@
+======================================================================
+FACE TEMPERATURE REGRESSION - RANDOM_FOREST RESULTS
+======================================================================
+
+--------------------------------------------------
+PERFORMANCE BY SPLIT (averaged over 3 trials)
+--------------------------------------------------
+
+Split      CV Train     CV Val       Test R2      Test RMSE    Test MAE    
+----------------------------------------------------------------------
+20_80      -0.0144      -0.0671      0.6918      0.2613       0.1894
+50_50      -0.0099      -0.0602      0.7244      0.2415       0.1757
+80_20      -0.0131      -0.0591      0.7339      0.2315       0.1738
+
+--------------------------------------------------
+BEST MODEL (highest R2)
+--------------------------------------------------
+Split: 80_20
+Trial: 3
+
+Best Parameters:
+  model__max_depth: None
+  model__max_features: sqrt
+  model__min_samples_leaf: 2
+  model__min_samples_split: 5
+  model__n_estimators: 100
+
+Test Metrics:
+  R2:   0.8068
+  RMSE: 0.2239 degC
+  MAE:  0.1741 degC
+  MSE:  0.050127
+
+--------------------------------------------------
+INTERPRETATION
+--------------------------------------------------
+Model Quality: GOOD (R2 = 0.8068)
+The model explains 80.7% of variance in oral temperature.
+Average prediction error: +/- 0.174 degC
