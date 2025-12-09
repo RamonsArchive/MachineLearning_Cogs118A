@@ -82,7 +82,7 @@ def generate_boosting(train_df, test_df, random_state, predictors, target_col):
     param_grid = {
         "model__n_estimators": [100, 200, 300],
         "model__learning_rate": [0.01, 0.05, 0.1],
-        "model__max_depth": [3, 5, 7],
+        "model__max_depth": [1, 2, 3, 5, 7],
         "model__subsample": [0.8, 1.0],
         "model__reg_alpha": [0, 0.1],
         "model__reg_lambda": [1, 10],

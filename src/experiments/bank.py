@@ -228,7 +228,7 @@ def main():
             boosting_result = generate_boosting(train_df, test_df, rs)
             random_forest_result = generate_random_forest(train_df, test_df, rs)
             neural_network_result = generate_neural_network(train_df, test_df, rs)
-            svm_result = generate_svm(train_df, test_df, rs)
+            # svm_result = generate_svm(train_df, test_df, rs)
 
             # EXPECTED fields in boosting_result (you can tweak names to your impl):
             # {
@@ -300,29 +300,29 @@ def main():
                 "training_info": neural_network_result["training_info"],
             }
 
-            svm_record = {
-                "trial": trial,
-                "best_params": svm_result["best_params"],
-                "cv_train_score": svm_result["cv_train_score"],
-                "cv_val_score": svm_result["cv_val_score"],
-                "test_accuracy": svm_result["test_metrics"]["accuracy"],
-                "test_metrics": svm_result["test_metrics"],
-                # For plots / confusion / ROC:
-                "y_test": svm_result["y_test"].tolist(),
-                "y_pred": svm_result["y_pred"].tolist(),
-                "y_proba": (
-                    svm_result["y_proba"].tolist()
-                    if svm_result["y_proba"] is not None
-                    else None
-                ),
-                # SVM info (unique to SVM)
-                "svm_info": svm_result["svm_info"],
-            }
+            # svm_record = {
+            #     "trial": trial,
+            #     "best_params": svm_result["best_params"],
+            #     "cv_train_score": svm_result["cv_train_score"],
+            #     "cv_val_score": svm_result["cv_val_score"],
+            #     "test_accuracy": svm_result["test_metrics"]["accuracy"],
+            #     "test_metrics": svm_result["test_metrics"],
+            #     # For plots / confusion / ROC:
+            #     "y_test": svm_result["y_test"].tolist(),
+            #     "y_pred": svm_result["y_pred"].tolist(),
+            #     "y_proba": (
+            #         svm_result["y_proba"].tolist()
+            #         if svm_result["y_proba"] is not None
+            #         else None
+            #     ),
+            #     # SVM info (unique to SVM)
+            #     "svm_info": svm_result["svm_info"],
+            # }
 
             results[BOOSTING_NAME][split_name].append(boosting_trial_record)
             results[RANDOM_FOREST_NAME][split_name].append(random_forest_record)
             results[NEURAL_NETWORK_NAME][split_name].append(neural_network_record)
-            results[SVM_NAME][split_name].append(svm_record)
+            # results[SVM_NAME][split_name].append(svm_record)
 
     # Save results to JSON
     results_dir = os.path.join(curr_dir, "..", "results")
@@ -349,8 +349,8 @@ def main():
     plot_bank_neural_network_summary(results[NEURAL_NETWORK_NAME], nn_plots_dir)
     
     # Plot SVM results
-    svm_plots_dir = os.path.join(base_plots_dir, "svm")
-    plot_bank_svm_summary(results[SVM_NAME], svm_plots_dir)
+    # svm_plots_dir = os.path.join(base_plots_dir, "svm")
+    # plot_bank_svm_summary(results[SVM_NAME], svm_plots_dir)
 
 
 if __name__ == "__main__":

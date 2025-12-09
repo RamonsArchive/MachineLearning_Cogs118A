@@ -58,9 +58,11 @@ def generate_boosting(train_df, test_df, random_state, predictors, target_col):
     """
     # Hyperparameter grid with regularization
     param_grid = {
-        "model__n_estimators": [100, 200],
-        "model__learning_rate": [0.05, 0.1],
-        "model__max_depth": [3, 5, 7],
+        # Slightly larger ensemble plus a smaller learning rate
+        "model__n_estimators": [100, 200, 300],
+        "model__learning_rate": [0.01, 0.05, 0.1],
+        # Shallower trees regularize individual learners
+        "model__max_depth": [2, 3, 5],
         "model__subsample": [0.8, 1.0],
         "model__colsample_bytree": [0.8, 1.0],
         "model__reg_alpha": [0, 0.1],      # L1 regularization
@@ -82,11 +84,12 @@ def generate_random_forest(train_df, test_df, random_state, predictors, target_c
     """Run Random Forest regression experiment."""
     
     # Hyperparameter grid for RF regression
+    # Drop extremely shallow trees (depth 1–2) which underfit badly.
     param_grid = {
-        "model__n_estimators": [50, 100, 200, 300],
-        "model__max_depth": [1, 3, 10, 20, None],
-        "model__min_samples_split": [2, 5],
-        "model__min_samples_leaf": [1, 2],
+        "model__n_estimators": [100, 200, 300],
+        "model__max_depth": [5, 10, 20, None],
+        "model__min_samples_split": [2, 5, 10],
+        "model__min_samples_leaf": [1, 2, 4],
         "model__max_features": ["sqrt", 0.5],
     }
     
@@ -103,16 +106,24 @@ def generate_random_forest(train_df, test_df, random_state, predictors, target_c
 
 def generate_neural_network(train_df, test_df, random_state, predictors, target_col):
     """Run Neural Network (MLP) regression experiment."""
-    
-    # Hyperparameter grid for NN regression
-    # Smaller networks often work better for ~1000 samples
+    # For this dataset, large networks severely overfit and give unstable CV scores.
+    # Use SMALLER, STRONGLY-REGULARIZED networks:
+    #   - architectures around 20–32 units
+    #   - stronger L2 (alpha)
+    #   - smaller learning rate
+    hidden_layer_sizes_grid = [
+        (20,),
+        (32,),
+        (20, 20),
+        (32, 16),
+    ]
+
     param_grid = {
-        "model__hidden_layer_sizes": [(64,), (128,), (64, 32), (128, 64)],
-        "model__alpha": [0.0001, 0.001, 0.01],  # L2 regularization
-        "model__learning_rate_init": [0.001, 0.01],
+        "model__alpha": [0.01, 0.1, 1.0],       # much stronger L2 to cut overfitting
+        "model__learning_rate_init": [0.0005, 0.001],
         "model__batch_size": [32, 64],
     }
-    
+
     return run_neural_net_experiment(
         train_df=train_df,
         test_df=test_df,
@@ -120,6 +131,7 @@ def generate_neural_network(train_df, test_df, random_state, predictors, target_
         target_col=target_col,
         problem_type="regression",
         random_state=random_state,
+        hidden_layer_sizes_grid=hidden_layer_sizes_grid,
         param_grid=param_grid,
     )
 
