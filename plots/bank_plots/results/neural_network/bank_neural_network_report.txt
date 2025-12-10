@@ -1,0 +1,71 @@
+======================================================================
+Bank Dataset � Neural Network (MLP) Summary Report
+======================================================================
+
+OVERVIEW
+----------------------------------------------------------------------
+Model: Multi-Layer Perceptron Classifier
+Evaluation: 10-fold Cross-Validation + Held-out Test Set
+Scoring Metric: ROC-AUC
+Activation: ReLU | Solver: Adam | Early Stopping: Yes
+
+PERFORMANCE BY SPLIT (averaged over 3 trials)
+----------------------------------------------------------------------
+Split        Train (CV)      Val (CV)        Test           
+----------------------------------------------------------------------
+20_80        0.4059          0.3826          0.7804         
+50_50        0.4105          0.3755          0.7838         
+80_20        0.4039          0.3768          0.7907         
+
+OVERFITTING ANALYSIS
+----------------------------------------------------------------------
+Split 20_80:
+  Train-Val gap: +0.0233 (>0.05 suggests overfitting)
+  Val-Test gap:  -0.3978
+Split 50_50:
+  Train-Val gap: +0.0350 (>0.05 suggests overfitting)
+  Val-Test gap:  -0.4083
+Split 80_20:
+  Train-Val gap: +0.0271 (>0.05 suggests overfitting)
+  Val-Test gap:  -0.4139
+
+BEST MODEL (by test ROC-AUC)
+----------------------------------------------------------------------
+Split: 80_20
+Trial: 0
+
+Best Hyperparameters:
+  alpha: 0.01
+  batch_size: 32
+  hidden_layer_sizes: (100, 50)
+  learning_rate_init: 0.001
+
+Training Details:
+  Architecture: (100, 50)
+  Iterations: 17
+  Final Loss: 0.273138
+
+Test Set Metrics:
+----------------------------------------
+  Accuracy:  0.8995
+  Precision: 0.6724
+  Recall:    0.2101
+  F1-Score:  0.3202
+  ROC-AUC:   0.7990
+
+(ROC-AUC from ROC curve plot: 0.7990)
+
+Detailed Classification Report (Test Set):
+----------------------------------------
+              precision    recall  f1-score   support
+
+      No (0)       0.91      0.99      0.95      7310
+     Yes (1)       0.67      0.21      0.32       928
+
+    accuracy                           0.90      8238
+   macro avg       0.79      0.60      0.63      8238
+weighted avg       0.88      0.90      0.88      8238
+
+======================================================================
+END OF REPORT
+======================================================================

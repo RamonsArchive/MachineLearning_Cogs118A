@@ -1,0 +1,34 @@
+Bank Dataset – Boosting Summary Report
+======================================
+
+Mean ROC-AUC by split (averaged over 3 trials):
+  Split 20_80: Train (CV) = 0.5348, Val (CV) = 0.4995, Test = 0.7909
+  Split 50_50: Train (CV) = 0.5316, Val (CV) = 0.5031, Test = 0.7964
+  Split 80_20: Train (CV) = 0.5245, Val (CV) = 0.5036, Test = 0.8041
+
+(Train vs Val/Test gives a sense of overfitting.
+ If Train >> Val/Test, model is likely overfitting.)
+
+
+Best model (by test ROC-AUC):
+  Split: 80_20
+  Trial index: 0
+  Best params: {'model__learning_rate': 0.01, 'model__max_depth': 7, 'model__n_estimators': 100, 'model__reg_alpha': 0, 'model__reg_lambda': 10, 'model__scale_pos_weight': 5, 'model__subsample': 0.8}
+
+  Test metrics:
+    accuracy: 0.8813
+    precision: 0.4777
+    recall: 0.5765
+    f1: 0.5225
+    roc_auc: 0.8162
+  ROC-AUC used in ROC plot: 0.8162
+
+Classification report (test set):
+              precision    recall  f1-score   support
+
+           0       0.94      0.92      0.93      7310
+           1       0.48      0.58      0.52       928
+
+    accuracy                           0.88      8238
+   macro avg       0.71      0.75      0.73      8238
+weighted avg       0.89      0.88      0.89      8238

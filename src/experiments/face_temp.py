@@ -60,7 +60,7 @@ def generate_boosting(train_df, test_df, random_state, predictors, target_col):
     param_grid = {
         # Slightly larger ensemble plus a smaller learning rate
         "model__n_estimators": [100, 200, 300],
-        "model__learning_rate": [0.01, 0.05, 0.1],
+        "model__learning_rate": [0.01, 0.05],
         # Shallower trees regularize individual learners
         "model__max_depth": [2, 3, 5],
         "model__subsample": [0.8, 1.0],
@@ -90,7 +90,7 @@ def generate_random_forest(train_df, test_df, random_state, predictors, target_c
         "model__max_depth": [5, 10, 20, None],
         "model__min_samples_split": [2, 5, 10],
         "model__min_samples_leaf": [1, 2, 4],
-        "model__max_features": ["sqrt", 0.5],
+        "model__max_features": ["sqrt"],
     }
     
     return run_random_forest_experiment(
@@ -120,7 +120,7 @@ def generate_neural_network(train_df, test_df, random_state, predictors, target_
 
     param_grid = {
         "model__alpha": [0.01, 0.1, 1.0],       # much stronger L2 to cut overfitting
-        "model__learning_rate_init": [0.0005, 0.001],
+        "model__learning_rate_init": [0.001, 0.01],
         "model__batch_size": [32, 64],
     }
 
@@ -246,33 +246,33 @@ def main():
             print(f"Train size: {len(train_df)}, Test size: {len(test_df)}")
             
             # ----- Run ElasticNet (Linear Baseline) -----
-            print(f"\n>>> Running ElasticNet Baseline (Trial {trial + 1})...")
-            elastic_result = generate_elastic_net(train_df, test_df, rs, predictors, target_col)
+            # print(f"\n>>> Running ElasticNet Baseline (Trial {trial + 1})...")
+            # elastic_result = generate_elastic_net(train_df, test_df, rs, predictors, target_col)
             
-            elastic_record = {
-                "trial": trial,
-                "best_params": elastic_result["best_params"],
-                "cv_train_score": elastic_result["cv_train_score"],
-                "cv_val_score": elastic_result["cv_val_score"],
-                "cv_scoring": elastic_result["cv_scoring"],
-                "regularization_type": elastic_result.get("regularization_type"),
-                "n_nonzero_coefs": elastic_result.get("n_nonzero_coefs"),
-                "test_metrics": {
-                    "mse": elastic_result["test_metrics"]["mse"],
-                    "rmse": elastic_result["test_metrics"]["rmse"],
-                    "mae": elastic_result["test_metrics"]["mae"],
-                    "r2": elastic_result["test_metrics"]["r2"],
-                },
-                "y_test": elastic_result["y_test"].tolist(),
-                "y_pred": elastic_result["y_pred"].tolist(),
-                "coefficients": (
-                    elastic_result["coefficients"].tolist()
-                    if elastic_result.get("coefficients") is not None
-                    else None
-                ),
-                "feature_names": elastic_result.get("feature_names"),
-            }
-            results[ELASTIC_NET_NAME][split_name].append(elastic_record)
+            # elastic_record = {
+            #     "trial": trial,
+            #     "best_params": elastic_result["best_params"],
+            #     "cv_train_score": elastic_result["cv_train_score"],
+            #     "cv_val_score": elastic_result["cv_val_score"],
+            #     "cv_scoring": elastic_result["cv_scoring"],
+            #     "regularization_type": elastic_result.get("regularization_type"),
+            #     "n_nonzero_coefs": elastic_result.get("n_nonzero_coefs"),
+            #     "test_metrics": {
+            #         "mse": elastic_result["test_metrics"]["mse"],
+            #         "rmse": elastic_result["test_metrics"]["rmse"],
+            #         "mae": elastic_result["test_metrics"]["mae"],
+            #         "r2": elastic_result["test_metrics"]["r2"],
+            #     },
+            #     "y_test": elastic_result["y_test"].tolist(),
+            #     "y_pred": elastic_result["y_pred"].tolist(),
+            #     "coefficients": (
+            #         elastic_result["coefficients"].tolist()
+            #         if elastic_result.get("coefficients") is not None
+            #         else None
+            #     ),
+            #     "feature_names": elastic_result.get("feature_names"),
+            # }
+            # results[ELASTIC_NET_NAME][split_name].append(elastic_record)
             
             # ----- Run Boosting (XGBoost) -----
             print(f"\n>>> Running XGBoost (Trial {trial + 1})...")
@@ -367,8 +367,8 @@ def main():
     plots_base = os.path.join(curr_dir, "../..", "plots/face_temp_plots/results")
     
     # ElasticNet baseline plots
-    elastic_plots_dir = os.path.join(plots_base, "elastic_net")
-    plot_face_temp_elastic_net_summary(results[ELASTIC_NET_NAME], elastic_plots_dir)
+    # elastic_plots_dir = os.path.join(plots_base, "elastic_net")
+    # plot_face_temp_elastic_net_summary(results[ELASTIC_NET_NAME], elastic_plots_dir)
     
     # Boosting (XGBoost) plots
     boosting_plots_dir = os.path.join(plots_base, "boosting")

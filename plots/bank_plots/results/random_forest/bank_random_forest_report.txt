@@ -1,0 +1,79 @@
+======================================================================
+Bank Dataset – Random Forest Summary Report
+======================================================================
+
+OVERVIEW
+----------------------------------------------------------------------
+Model: Random Forest Classifier
+Evaluation: 10-fold Cross-Validation + Held-out Test Set
+Scoring Metric: ROC-AUC
+
+PERFORMANCE BY SPLIT (averaged over 3 trials)
+----------------------------------------------------------------------
+Split        Train (CV)      Val (CV)        Test           
+----------------------------------------------------------------------
+20_80        0.6329          0.4956          0.7852         
+50_50        0.5952          0.4980          0.7906         
+80_20        0.5890          0.4985          0.7966         
+
+OVERFITTING ANALYSIS
+----------------------------------------------------------------------
+Split 20_80:
+  Train-Val gap: +0.1372 (>0.05 suggests overfitting)
+  Val-Test gap:  -0.2895 (large gap = CV overestimates performance)
+Split 50_50:
+  Train-Val gap: +0.0972 (>0.05 suggests overfitting)
+  Val-Test gap:  -0.2927 (large gap = CV overestimates performance)
+Split 80_20:
+  Train-Val gap: +0.0905 (>0.05 suggests overfitting)
+  Val-Test gap:  -0.2981 (large gap = CV overestimates performance)
+
+BEST MODEL (by test ROC-AUC)
+----------------------------------------------------------------------
+Split: 80_20
+Trial: 0
+
+Best Hyperparameters:
+  max_depth: 16
+  max_features: sqrt
+  min_samples_leaf: 2
+  min_samples_split: 10
+  n_estimators: 300
+
+Test Set Metrics:
+----------------------------------------
+  Accuracy:  0.8758
+  Precision: 0.4609
+  Recall:    0.6034
+  F1-Score:  0.5226
+  ROC-AUC:   0.8088
+
+(ROC-AUC from ROC curve plot: 0.8088)
+
+Detailed Classification Report (Test Set):
+----------------------------------------
+              precision    recall  f1-score   support
+
+      No (0)       0.95      0.91      0.93      7310
+     Yes (1)       0.46      0.60      0.52       928
+
+    accuracy                           0.88      8238
+   macro avg       0.70      0.76      0.73      8238
+weighted avg       0.89      0.88      0.88      8238
+
+Top 10 Most Important Features:
+----------------------------------------
+   1. euribor3m                      0.1704
+   2. nr.employed                    0.1187
+   3. emp.var.rate                   0.0762
+   4. age                            0.0745
+   5. cons.conf.idx                  0.0531
+   6. cons.price.idx                 0.0437
+   7. poutcome_success               0.0333
+   8. pdays                          0.0289
+   9. contact_telephone              0.0220
+  10. month_may                      0.0198
+
+======================================================================
+END OF REPORT
+======================================================================
