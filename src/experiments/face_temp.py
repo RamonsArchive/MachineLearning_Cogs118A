@@ -42,7 +42,7 @@ RANDOM_STATE = 42
 BOOSTING_NAME = "boosting"  # Now uses XGBoost under the hood
 RANDOM_FOREST_NAME = "random_forest"
 NEURAL_NETWORK_NAME = "neural_network"
-ELASTIC_NET_NAME = "elastic_net"
+# ELASTIC_NET_NAME = "elastic_net"
 
 
 # ==========================================
@@ -209,7 +209,7 @@ def main():
     n_trials = 3
     
     results = {
-        ELASTIC_NET_NAME: {},  # Linear baseline (auto-finds best L1/L2 mix)
+        # ELASTIC_NET_NAME: {},  # Linear baseline (auto-finds best L1/L2 mix)
         BOOSTING_NAME: {},     # XGBoost with built-in regularization
         RANDOM_FOREST_NAME: {},
         NEURAL_NETWORK_NAME: {},
@@ -223,7 +223,7 @@ def main():
         print(f"SPLIT {split_name} (test_size={test_size})")
         print(f"{'='*60}")
         
-        results[ELASTIC_NET_NAME][split_name] = []
+        # results[ELASTIC_NET_NAME][split_name] = []
         results[BOOSTING_NAME][split_name] = []
         results[RANDOM_FOREST_NAME][split_name] = []
         results[NEURAL_NETWORK_NAME][split_name] = []

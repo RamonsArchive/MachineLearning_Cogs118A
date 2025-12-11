@@ -1,5 +1,5 @@
 ======================================================================
-FACE TEMPERATURE REGRESSION - BOOSTING RESULTS
+PARKINSON'S TELEMONITORING - RANDOM_FOREST RESULTS
 ======================================================================
 
 --------------------------------------------------
@@ -8,34 +8,32 @@ PERFORMANCE BY SPLIT (averaged over 3 trials)
 
 Split      CV Train     CV Val       Test R2      Test RMSE    Test MAE    
 ----------------------------------------------------------------------
-20_80      -0.0188      -0.0734      0.6696      0.2705       0.1918
-50_50      -0.0298      -0.0610      0.7324      0.2377       0.1741
-80_20      -0.0311      -0.0580      0.7355      0.2317       0.1726
+20_80      -6.9305      -49.8204      0.5810      6.9126       5.4946
+50_50      -4.8989      -34.8758      0.7174      5.6573       4.3947
+80_20      -3.9574      -28.6872      0.7685      5.0185       3.8344
 
 --------------------------------------------------
 BEST MODEL (highest R2)
 --------------------------------------------------
 Split: 80_20
-Trial: 3
+Trial: 1
 
 Best Parameters:
-  model__colsample_bytree: 1.0
-  model__learning_rate: 0.05
-  model__max_depth: 3
-  model__n_estimators: 100
-  model__reg_alpha: 0
-  model__reg_lambda: 1
-  model__subsample: 0.8
+  model__max_depth: None
+  model__max_features: sqrt
+  model__min_samples_leaf: 1
+  model__min_samples_split: 2
+  model__n_estimators: 300
 
 Test Metrics:
-  R2:   0.8021
-  RMSE: 0.2266 degC
-  MAE:  0.1725 degC
-  MSE:  0.051359
+  R2:   0.7791
+  RMSE: 4.9478 degC
+  MAE:  3.8340 degC
+  MSE:  24.480492
 
 --------------------------------------------------
 INTERPRETATION
 --------------------------------------------------
-Model Quality: GOOD (R2 = 0.8021)
-The model explains 80.2% of variance in oral temperature.
-Average prediction error: +/- 0.172 degC
+Model Quality: GOOD (R2 = 0.7791)
+The model explains 77.9% of variance in UPDRS scores.
+Average prediction error: +/- 3.834 degC
