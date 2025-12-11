@@ -80,9 +80,9 @@ def generate_boosting(train_df, test_df, random_state, predictors, target_col):
     Grid tuned for ~6k samples, 19 features, weak correlations.
     """
     param_grid = {
-        "model__n_estimators": [100, 200, 300],
+        "model__n_estimators": [300, 500, 800],
         "model__learning_rate": [0.01, 0.05],
-        "model__max_depth": [1, 2, 3, 5, 7],
+        "model__max_depth": [1, 2, 3, 5, 7, 10],
         "model__subsample": [0.8, 1.0],
         "model__reg_alpha": [0, 0.1],
         "model__reg_lambda": [1, 10],
@@ -104,7 +104,7 @@ def generate_random_forest(train_df, test_df, random_state, predictors, target_c
     Grid tuned for ~6k samples, 19 features.
     """
     param_grid = {
-        "model__n_estimators": [100, 200, 300],
+        "model__n_estimators": [300, 500, 900],
         "model__max_depth": [10, 20, None],
         "model__min_samples_split": [2, 5, 10],
         "model__min_samples_leaf": [1, 2, 4],
@@ -127,10 +127,10 @@ def generate_neural_network(train_df, test_df, random_state, predictors, target_
     Smaller networks for ~6k samples to avoid overfitting.
     """
     param_grid = {
-        "model__hidden_layer_sizes": [(32,), (64,), (32, 16), (64, 32)],
+        "model__hidden_layer_sizes": [(32, 16), (64, 32), (100, 50)],
         "model__alpha": [0.001, 0.01],
         "model__learning_rate_init": [0.001, 0.01],
-        "model__batch_size": [32, 64],
+        "model__batch_size": [12, 32, 64],
     }
     return run_neural_net_experiment(
         train_df=train_df,

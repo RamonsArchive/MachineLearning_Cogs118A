@@ -59,10 +59,10 @@ def generate_boosting(train_df, test_df, random_state, predictors, target_col):
     # Hyperparameter grid with regularization
     param_grid = {
         # Slightly larger ensemble plus a smaller learning rate
-        "model__n_estimators": [100, 200, 300],
+        "model__n_estimators": [50, 100, 200],
         "model__learning_rate": [0.01, 0.05],
         # Shallower trees regularize individual learners
-        "model__max_depth": [2, 3, 5],
+        "model__max_depth": [1, 2, 3],
         "model__subsample": [0.8, 1.0],
         "model__colsample_bytree": [0.8, 1.0],
         "model__reg_alpha": [0, 0.1],      # L1 regularization
@@ -86,8 +86,8 @@ def generate_random_forest(train_df, test_df, random_state, predictors, target_c
     # Hyperparameter grid for RF regression
     # Drop extremely shallow trees (depth 1–2) which underfit badly.
     param_grid = {
-        "model__n_estimators": [100, 200, 300],
-        "model__max_depth": [5, 10, 20, None],
+        "model__n_estimators": [50, 100, 200, 300],
+        "model__max_depth": [2, 5, None],
         "model__min_samples_split": [2, 5, 10],
         "model__min_samples_leaf": [1, 2, 4],
         "model__max_features": ["sqrt"],
@@ -113,15 +113,15 @@ def generate_neural_network(train_df, test_df, random_state, predictors, target_
     #   - smaller learning rate
     hidden_layer_sizes_grid = [
         (20,),
-        (32,),
+        (20, 10),
         (20, 20),
-        (32, 16),
+        (32,),
     ]
 
     param_grid = {
         "model__alpha": [0.01, 0.1, 1.0],       # much stronger L2 to cut overfitting
         "model__learning_rate_init": [0.001, 0.01],
-        "model__batch_size": [32, 64],
+        "model__batch_size": [32, 64, 150],
     }
 
     return run_neural_net_experiment(
