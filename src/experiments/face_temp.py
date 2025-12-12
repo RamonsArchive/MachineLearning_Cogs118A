@@ -119,7 +119,7 @@ def generate_neural_network(train_df, test_df, random_state, predictors, target_
     ]
 
     param_grid = {
-        "model__alpha": [0.01, 0.1, 1.0],       # much stronger L2 to cut overfitting
+        "model__alpha": [0.01, 0.1, 1.0, 0],       # much stronger L2 to cut overfitting
         "model__learning_rate_init": [0.001, 0.01],
         "model__batch_size": [32, 64, 150],
     }

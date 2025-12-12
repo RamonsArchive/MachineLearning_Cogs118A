@@ -35,7 +35,6 @@ from graphs.parkinsons_plots import (
     plot_parkinsons_boosting_summary,
     plot_parkinsons_random_forest_summary,
     plot_parkinsons_neural_network_summary,
-    plot_parkinsons_elastic_net_summary,
     plot_parkinsons_model_comparison,
 )
 
@@ -80,10 +79,10 @@ def generate_boosting(train_df, test_df, random_state, predictors, target_col):
     Grid tuned for ~6k samples, 19 features, weak correlations.
     """
     param_grid = {
-        "model__n_estimators": [300, 500, 800],
+        "model__n_estimators": [500, 800, 1200],
         "model__learning_rate": [0.01, 0.05],
-        "model__max_depth": [1, 2, 3, 5, 7, 10],
-        "model__subsample": [0.8, 1.0],
+        "model__max_depth": [7, 10, 12, 15],
+        "model__subsample": [0.5, 0.8],
         "model__reg_alpha": [0, 0.1],
         "model__reg_lambda": [1, 10],
     }
@@ -129,8 +128,8 @@ def generate_neural_network(train_df, test_df, random_state, predictors, target_
     param_grid = {
         "model__hidden_layer_sizes": [(32, 16), (64, 32), (100, 50)],
         "model__alpha": [0.001, 0.01],
-        "model__learning_rate_init": [0.001, 0.01],
-        "model__batch_size": [12, 32, 64],
+        "model__learning_rate_init": [0.05,0.01],
+        "model__batch_size": [6, 12, 32],
     }
     return run_neural_net_experiment(
         train_df=train_df,
@@ -188,7 +187,7 @@ def main():
     n_trials = 3
     
     results = {
-        ELASTIC_NET_NAME: {},
+       # ELASTIC_NET_NAME: {},
         BOOSTING_NAME: {},
         RANDOM_FOREST_NAME: {},
         NEURAL_NETWORK_NAME: {},
