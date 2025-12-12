@@ -1,0 +1,58 @@
+================================================================================
+WINE DATASET – EXPLORATORY DATA ANALYSIS
+================================================================================
+
+DATA INFO:
+--------------------------------------------------------------------------------
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 178 entries, 0 to 177
+Data columns (total 14 columns):
+ #   Column                Non-Null Count  Dtype  
+---  ------                --------------  -----  
+ 0   Class                 178 non-null    int64  
+ 1   Alcohol               178 non-null    float64
+ 2   Malic_acid            178 non-null    float64
+ 3   Ash                   178 non-null    float64
+ 4   Alcalinity_of_ash     178 non-null    float64
+ 5   Magnesium             178 non-null    int64  
+ 6   Total_phenols         178 non-null    float64
+ 7   Flavanoids            178 non-null    float64
+ 8   Nonflavanoid_phenols  178 non-null    float64
+ 9   Proanthocyanins       178 non-null    float64
+ 10  Color_intensity       178 non-null    float64
+ 11  Hue                   178 non-null    float64
+ 12  OD280_OD315           178 non-null    float64
+ 13  Proline               178 non-null    int64  
+dtypes: float64(11), int64(3)
+memory usage: 19.6 KB
+
+
+DATA DESCRIBE (NUMERIC FEATURES):
+--------------------------------------------------------------------------------
+            Class     Alcohol  Malic_acid         Ash  Alcalinity_of_ash   Magnesium  Total_phenols  Flavanoids  Nonflavanoid_phenols  Proanthocyanins  Color_intensity         Hue  OD280_OD315      Proline
+count  178.000000  178.000000  178.000000  178.000000         178.000000  178.000000     178.000000  178.000000            178.000000       178.000000       178.000000  178.000000   178.000000   178.000000
+mean     1.938202   13.000618    2.336348    2.366517          19.494944   99.741573       2.295112    2.029270              0.361854         1.590899         5.058090    0.957449     2.611685   746.893258
+std      0.775035    0.811827    1.117146    0.274344           3.339564   14.282484       0.625851    0.998859              0.124453         0.572359         2.318286    0.228572     0.709990   314.907474
+min      1.000000   11.030000    0.740000    1.360000          10.600000   70.000000       0.980000    0.340000              0.130000         0.410000         1.280000    0.480000     1.270000   278.000000
+25%      1.000000   12.362500    1.602500    2.210000          17.200000   88.000000       1.742500    1.205000              0.270000         1.250000         3.220000    0.782500     1.937500   500.500000
+50%      2.000000   13.050000    1.865000    2.360000          19.500000   98.000000       2.355000    2.135000              0.340000         1.555000         4.690000    0.965000     2.780000   673.500000
+75%      3.000000   13.677500    3.082500    2.557500          21.500000  107.000000       2.800000    2.875000              0.437500         1.950000         6.200000    1.120000     3.170000   985.000000
+max      3.000000   14.830000    5.800000    3.230000          30.000000  162.000000       3.880000    5.080000              0.660000         3.580000        13.000000    1.710000     4.000000  1680.000000
+
+================================================================================
+NAIVE BASELINES (What to beat!)
+================================================================================
+
+Class Distribution:
+----------------------------------------
+  Class 1:  59 (33.15%)
+  Class 2:  71 (39.89%)
+  Class 3:  48 (26.97%)
+  Total: 178
+
+Baseline 1: Majority Class Classifier (always predict most frequent class)
+----------------------------------------
+  Majority class: 2
+  Accuracy:       0.3989 (39.89%)
+
+Your models (XGBoost, Random Forest, Neural Net) should beat this accuracy.

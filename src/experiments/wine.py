@@ -21,6 +21,7 @@ from models.neural_net import run_neural_net_experiment
 from graphs.wine_boosting_plots import plot_wine_boosting_summary
 from graphs.wine_random_forest_plots import plot_wine_random_forest_summary
 from graphs.wine_neural_network_plots import plot_wine_neural_network_summary
+from graphs.wine_model_comparison import plot_wine_model_comparison
 
 
 RANDOM_STATE = 42
@@ -255,6 +256,9 @@ def main():
 
     nn_plots_dir = os.path.join(base_plots_dir, "neural_network")
     plot_wine_neural_network_summary(results[NEURAL_NETWORK_NAME], nn_plots_dir)
+
+    comparison_dir = os.path.join(base_plots_dir, "comparison")
+    plot_wine_model_comparison(results, comparison_dir)
 
 
 if __name__ == "__main__":

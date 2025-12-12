@@ -1,0 +1,37 @@
+Wine Dataset – Neural Network (MLP) Summary Report
+======================================================================
+
+PERFORMANCE BY SPLIT (averaged over 3 trials)
+----------------------------------------------------------------------
+20_80      Train (CV) = nan, Val (CV) = nan, Test Acc = 0.4918
+50_50      Train (CV) = nan, Val (CV) = nan, Test Acc = 0.8464
+80_20      Train (CV) = nan, Val (CV) = nan, Test Acc = 0.9444
+
+Best model (by test accuracy):
+----------------------------------------------------------------------
+  Split: 80_20
+  Trial index: 1
+  Best params: {'model__alpha': 0.0001, 'model__batch_size': 16, 'model__hidden_layer_sizes': (16,), 'model__learning_rate_init': 0.001}
+
+  Test metrics:
+    accuracy: 0.9722
+    precision: 0.9747
+    recall: 0.9722
+    f1: 0.9724
+    roc_auc: 1.0000
+
+  Training details:
+    Architecture: (16,)
+    Iterations:  39
+    Final loss:  0.137488
+
+Classification report (test set):
+              precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00        12
+           1       1.00      0.93      0.96        14
+           2       0.91      1.00      0.95        10
+
+    accuracy                           0.97        36
+   macro avg       0.97      0.98      0.97        36
+weighted avg       0.97      0.97      0.97        36

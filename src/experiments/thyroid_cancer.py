@@ -21,6 +21,7 @@ from models.neural_net import run_neural_net_experiment
 from graphs.thyroid_boosting_plots import plot_thyroid_boosting_summary
 from graphs.thyroid_random_forest_plots import plot_thyroid_random_forest_summary
 from graphs.thyroid_neural_network_plots import plot_thyroid_neural_network_summary
+from graphs.thyroid_model_comparison import plot_thyroid_model_comparison
 
 
 RANDOM_STATE = 42
@@ -244,6 +245,9 @@ def main():
 
     nn_plots_dir = os.path.join(base_plots_dir, "neural_network")
     plot_thyroid_neural_network_summary(results[NEURAL_NETWORK_NAME], nn_plots_dir)
+
+    comparison_dir = os.path.join(base_plots_dir, "comparison")
+    plot_thyroid_model_comparison(results, comparison_dir)
 
 
 if __name__ == "__main__":

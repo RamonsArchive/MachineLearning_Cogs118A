@@ -205,20 +205,30 @@ def run_boosting_experiment(
     y_proba = None
 
     if problem_type == "classification":
+        # Multi-class aware metrics
+        n_classes = len(np.unique(y_train))
+        avg = "weighted" if n_classes > 2 else "binary"
+
         # Get probabilities for ROC
         if hasattr(best_estimator.named_steps["model"], "predict_proba"):
-            y_proba = best_estimator.predict_proba(X_test)[:, 1]
+            y_proba_full = best_estimator.predict_proba(X_test)
+            y_proba = y_proba_full if n_classes > 2 else y_proba_full[:, 1]
             try:
-                roc_auc = roc_auc_score(y_test, y_proba)
+                roc_auc = roc_auc_score(
+                    y_test,
+                    y_proba,
+                    multi_class="ovr" if n_classes > 2 else "raise",
+                    average="weighted" if n_classes > 2 else "macro",
+                )
             except ValueError:
                 roc_auc = np.nan
         else:
             roc_auc = np.nan
 
         test_metrics["accuracy"] = accuracy_score(y_test, y_pred)
-        test_metrics["precision"] = precision_score(y_test, y_pred, zero_division=0)
-        test_metrics["recall"] = recall_score(y_test, y_pred, zero_division=0)
-        test_metrics["f1"] = f1_score(y_test, y_pred, zero_division=0)
+        test_metrics["precision"] = precision_score(y_test, y_pred, average=avg, zero_division=0)
+        test_metrics["recall"] = recall_score(y_test, y_pred, average=avg, zero_division=0)
+        test_metrics["f1"] = f1_score(y_test, y_pred, average=avg, zero_division=0)
         test_metrics["roc_auc"] = roc_auc
 
         print(f"Test Accuracy : {test_metrics['accuracy']:.4f}")
