@@ -37,11 +37,11 @@ def generate_boosting(train_df, test_df, random_state, predictors, target_col):
     """
     param_grid = {
         "model__n_estimators": [50, 100],
-        "model__learning_rate": [0.05, 0.1],
-        "model__max_depth": [2, 3],
-        "model__subsample": [0.8, 1.0],
-        "model__reg_alpha": [0, 0.1],
-        "model__reg_lambda": [1, 10],
+        "model__learning_rate": [0.05, 0.1, 0.01],
+        "model__max_depth": [1, 2, 3],
+        "model__subsample": [0.5,0.8, 1.0],
+        "model__reg_alpha": [0, 0.1, 0.5],
+        "model__reg_lambda": [1, 10, 100],
     }
 
     return run_boosting_experiment(
@@ -52,6 +52,7 @@ def generate_boosting(train_df, test_df, random_state, predictors, target_col):
         problem_type="classification",
         random_state=random_state,
         param_grid=param_grid,
+        scoring="f1",
     )
 
 
@@ -59,9 +60,9 @@ def generate_random_forest(train_df, test_df, random_state, predictors, target_c
     """Random Forest classification with modest grid for Thyroid dataset."""
     param_grid = {
         "model__n_estimators": [100, 200],
-        "model__max_depth": [3, 5, None],
-        "model__min_samples_split": [2, 4],
-        "model__min_samples_leaf": [1, 2],
+        "model__max_depth": [1, 2, 3, None],
+        "model__min_samples_split": [1, 2, 3],
+        "model__min_samples_leaf": [1, 2, 3],
         "model__max_features": ["sqrt"],
     }
 
@@ -73,6 +74,7 @@ def generate_random_forest(train_df, test_df, random_state, predictors, target_c
         problem_type="classification",
         random_state=random_state,
         param_grid=param_grid,
+        scoring="f1",
     )
 
 
@@ -249,17 +251,10 @@ def main():
     comparison_dir = os.path.join(base_plots_dir, "comparison")
     plot_thyroid_model_comparison(results, comparison_dir)
 
+    print("\n" + "=" * 60)
+    print("THYROID CANCER EXPERIMENT COMPLETE!")
+    print("=" * 60)
 
-if __name__ == "__main__":
-    main()
-
-
-RANDOM_STATE = 42
-BOOSTING_NAME = "boosting"
-RANDOM_FOREST_NAME = "random_forest"
-NEURAL_NETWORK_NAME = "neural_network"
-def main():
-    print("Running Thyroid Cancer Classification Experiment")
 
 if __name__ == "__main__":
     main()

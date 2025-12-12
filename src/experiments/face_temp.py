@@ -77,6 +77,7 @@ def generate_boosting(train_df, test_df, random_state, predictors, target_col):
         problem_type="regression",
         random_state=random_state,
         param_grid=param_grid,
+        scoring="neg_mean_squared_error",
     )
 
 
@@ -101,6 +102,7 @@ def generate_random_forest(train_df, test_df, random_state, predictors, target_c
         problem_type="regression",
         random_state=random_state,
         param_grid=param_grid,
+        scoring="neg_mean_squared_error",
     )
 
 
@@ -133,6 +135,7 @@ def generate_neural_network(train_df, test_df, random_state, predictors, target_
         random_state=random_state,
         hidden_layer_sizes_grid=hidden_layer_sizes_grid,
         param_grid=param_grid,
+        scoring="neg_mean_squared_error",
     )
 
 

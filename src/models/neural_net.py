@@ -123,6 +123,7 @@ def run_neural_net_experiment(
     random_state: int = 42,
     hidden_layer_sizes_grid: list | None = None,
     param_grid: dict | None = None,
+    scoring: str | None = None,
 ):
     """
     Neural Network experiment:
@@ -204,10 +205,15 @@ def run_neural_net_experiment(
         full_param_grid.update(param_grid)
 
     # Choose scoring
-    if problem_type == "classification":
-        scoring = "f1"  # Optimizes for balance of precision AND recall
-    else:
-        scoring = "neg_mean_squared_error"
+    if scoring is None:
+        if problem_type == "classification":
+            n_classes = len(np.unique(y_train))
+            if n_classes > 2:
+                scoring = "f1_macro"
+            else:
+                scoring = "roc_auc"
+        else:
+            scoring = "neg_mean_squared_error"
 
     # =========================
     # 4. Grid search (5-fold CV) on TRAIN ONLY

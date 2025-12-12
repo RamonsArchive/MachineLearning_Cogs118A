@@ -1,17 +1,17 @@
-Wine Dataset ï¿½ XGBoost (Boosting) Summary Report
+Wine Dataset – XGBoost (Boosting) Summary Report
 ======================================================================
 
 PERFORMANCE BY SPLIT (averaged over 3 trials)
 ----------------------------------------------------------------------
-20_80      Train (CV) = nan, Val (CV) = nan, Test Acc = 0.9627
-50_50      Train (CV) = nan, Val (CV) = nan, Test Acc = 0.9663
-80_20      Train (CV) = nan, Val (CV) = nan, Test Acc = 0.9815
+20_80      Train (CV) = 1.0000, Val (CV) = 0.8792, Test Acc = 0.9487
+50_50      Train (CV) = 1.0000, Val (CV) = 0.9587, Test Acc = 0.9663
+80_20      Train (CV) = 1.0000, Val (CV) = 0.9696, Test Acc = 0.9907
 
 Best model (by test accuracy):
 ----------------------------------------------------------------------
   Split: 80_20
-  Trial index: 2
-  Best params: {'model__learning_rate': 0.05, 'model__max_depth': 2, 'model__n_estimators': 50, 'model__reg_alpha': 0, 'model__reg_lambda': 1, 'model__subsample': 0.8}
+  Trial index: 0
+  Best params: {'model__learning_rate': 0.1, 'model__max_depth': 3, 'model__n_estimators': 100, 'model__reg_alpha': 0, 'model__reg_lambda': 10, 'model__subsample': 0.8}
 
   Test metrics:
     accuracy: 1.0000

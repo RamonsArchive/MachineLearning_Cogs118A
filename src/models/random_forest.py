@@ -7,6 +7,7 @@ Random Forest Classifier for Bank Marketing Dataset
 - No data leakage: test set never touched during hyperparameter tuning
 """
 
+import os
 import numpy as np
 import pandas as pd
 
@@ -47,14 +48,14 @@ def _build_preprocessing_and_model(num_cols, cat_cols, problem_type, random_stat
     if problem_type == "classification":
         model = RandomForestClassifier(
             random_state=random_state,
-            n_jobs=-1,  # Use all CPU cores
+            n_jobs=max(1, os.cpu_count() - 1),  # Leave one CPU core free to prevent resource leaks
             bootstrap=True,
             class_weight='balanced',  # Penalize missing minority class more!
         )
     elif problem_type == "regression":
         model = RandomForestRegressor(
             random_state=random_state,
-            n_jobs=-1,
+            n_jobs=max(1, os.cpu_count() - 1),
             bootstrap=True,
         )
     else:
@@ -76,6 +77,7 @@ def run_random_forest_experiment(
     problem_type: str = "classification",
     random_state: int = 42,
     param_grid: dict | None = None,
+    scoring: str | None = None,
 ):
     """
     Random Forest experiment:
@@ -136,10 +138,15 @@ def run_random_forest_experiment(
         }
 
     # Choose scoring
-    if problem_type == "classification":
-        scoring = "f1"  # Optimizes for balance of precision AND recall
-    else:
-        scoring = "neg_mean_squared_error"
+    if scoring is None:
+        if problem_type == "classification":
+            n_classes = len(np.unique(y_train))
+            if n_classes > 2:
+                scoring = "f1_weighted"
+            else:
+                scoring = "roc_auc"  # Optimizes for balance of precision AND recall
+        else:
+            scoring = "neg_mean_squared_error"
 
     # =========================
     # 4. Grid search (5-fold CV) on TRAIN ONLY
@@ -159,7 +166,7 @@ def run_random_forest_experiment(
         param_grid=param_grid,
         cv=cv,
         scoring=scoring,
-        n_jobs=-1,
+        n_jobs=max(1, os.cpu_count() - 1),
         refit=True,       # refit best model on full train set
         verbose=1,
         return_train_score=True,

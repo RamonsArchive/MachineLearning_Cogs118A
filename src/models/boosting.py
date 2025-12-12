@@ -20,6 +20,7 @@ Key Hyperparameters:
 - reg_lambda: L2 regularization (default 1)
 """
 
+import os
 import numpy as np
 import pandas as pd
 
@@ -55,14 +56,14 @@ def _build_preprocessing_and_model(num_cols, cat_cols, problem_type, random_stat
     if problem_type == "classification":
         model = XGBClassifier(
             random_state=random_state,
-            n_jobs=-1,
+            n_jobs=max(1, os.cpu_count() - 1),
             eval_metric='logloss',
             verbosity=0,
         )
     elif problem_type == "regression":
         model = XGBRegressor(
             random_state=random_state,
-            n_jobs=-1,
+            n_jobs=max(1, os.cpu_count() - 1),
             verbosity=0,
         )
     else:
@@ -84,6 +85,7 @@ def run_boosting_experiment(
     problem_type: str = "classification",
     random_state: int = 42,
     param_grid: dict | None = None,
+    scoring: str | None = None,
 ):
     """
     Run XGBoost experiment (classification or regression).
@@ -152,10 +154,15 @@ def run_boosting_experiment(
             }
 
     # Choose scoring
-    if problem_type == "classification":
-        scoring = "f1"
-    else:
-        scoring = "neg_mean_squared_error"
+    if scoring is None:
+        if problem_type == "classification":
+            n_classes = len(np.unique(y_train))
+            if n_classes > 2:
+                scoring = "f1_weighted"
+            else:
+                scoring = "roc_auc"
+        else:
+            scoring = "neg_mean_squared_error"
 
     # =========================
     # 4. Grid search CV
@@ -170,7 +177,7 @@ def run_boosting_experiment(
         param_grid=param_grid,
         cv=cv,
         scoring=scoring,
-        n_jobs=-1,
+        n_jobs=max(1, os.cpu_count() - 1),
         refit=True,
         verbose=1,
         return_train_score=True,
@@ -212,18 +219,28 @@ def run_boosting_experiment(
         # Get probabilities for ROC
         if hasattr(best_estimator.named_steps["model"], "predict_proba"):
             y_proba_full = best_estimator.predict_proba(X_test)
-            y_proba = y_proba_full if n_classes > 2 else y_proba_full[:, 1]
-            try:
-                roc_auc = roc_auc_score(
-                    y_test,
-                    y_proba,
-                    multi_class="ovr" if n_classes > 2 else "raise",
-                    average="weighted" if n_classes > 2 else "macro",
-                )
-            except ValueError:
-                roc_auc = np.nan
+            if n_classes > 2:
+                # Multiclass: use full probability matrix
+                y_proba = y_proba_full
+                try:
+                    roc_auc = roc_auc_score(
+                        y_test,
+                        y_proba,
+                        multi_class="ovr",
+                        average="weighted",
+                    )
+                except ValueError:
+                    roc_auc = np.nan
+            else:
+                # Binary: use probabilities for positive class
+                y_proba = y_proba_full[:, 1]
+                try:
+                    roc_auc = roc_auc_score(y_test, y_proba)
+                except ValueError:
+                    roc_auc = np.nan
         else:
             roc_auc = np.nan
+            y_proba = None
 
         test_metrics["accuracy"] = accuracy_score(y_test, y_pred)
         test_metrics["precision"] = precision_score(y_test, y_pred, average=avg, zero_division=0)

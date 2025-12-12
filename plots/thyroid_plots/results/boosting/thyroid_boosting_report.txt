@@ -1,0 +1,33 @@
+Thyroid Cancer Dataset – XGBoost (Boosting) Summary Report
+======================================================================
+
+PERFORMANCE BY SPLIT (averaged over 3 trials)
+----------------------------------------------------------------------
+20_80      Train (CV) = 0.9498, Val (CV) = 0.9008, Test Acc = 0.9490
+50_50      Train (CV) = 0.9405, Val (CV) = 0.9159, Test Acc = 0.9722
+80_20      Train (CV) = 0.9586, Val (CV) = 0.9439, Test Acc = 0.9610
+
+Best model (by ROC-AUC):
+----------------------------------------------------------------------
+  Split: 80_20
+  Trial index: 2
+  Best params: {'model__learning_rate': 0.05, 'model__max_depth': 2, 'model__n_estimators': 100, 'model__reg_alpha': 0.1, 'model__reg_lambda': 1, 'model__subsample': 0.8}
+
+  Test metrics:
+    accuracy: 0.9740
+    precision: 1.0000
+    recall: 0.9091
+    f1: 0.9524
+    roc_auc: 0.9967
+
+  ROC-AUC used in ROC plot: 0.9967
+
+Classification report (test set):
+              precision    recall  f1-score   support
+
+           0       0.96      1.00      0.98        55
+           1       1.00      0.91      0.95        22
+
+    accuracy                           0.97        77
+   macro avg       0.98      0.95      0.97        77
+weighted avg       0.97      0.97      0.97        77

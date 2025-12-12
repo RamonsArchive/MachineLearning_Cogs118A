@@ -26,10 +26,10 @@ def main():
     # print("=" * 80)
     # face_temp_main()
 
-    print("\n" + "=" * 80)
-    print("RUNNING THYROID CANCER EXPERIMENTS")
-    print("=" * 80)
-    thyroid_cancer_main()
+    # print("\n" + "=" * 80)
+    # print("RUNNING THYROID CANCER EXPERIMENTS")
+    # print("=" * 80)
+    # thyroid_cancer_main()
 
     print("\n" + "=" * 80)
     print("RUNNING WINE QUALITY EXPERIMENTS")

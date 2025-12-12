@@ -58,6 +58,7 @@ def generate_boosting(train_df, test_df, RANDOM_STATE):
         problem_type="classification",
         random_state=RANDOM_STATE,
         param_grid=param_grid,
+        scoring="f1",
     )
 
     return results
@@ -93,6 +94,7 @@ def generate_random_forest(train_df, test_df, RANDOM_STATE):
         problem_type="classification",
         random_state=RANDOM_STATE,
         param_grid=param_grid,
+        scoring="f1"
     )
 
     return results
@@ -127,6 +129,7 @@ def generate_neural_network(train_df, test_df, RANDOM_STATE):
         random_state=RANDOM_STATE,
         hidden_layer_sizes_grid=hidden_layer_sizes_grid,
         param_grid=param_grid,
+        scoring="f1"
     )
     
     return results

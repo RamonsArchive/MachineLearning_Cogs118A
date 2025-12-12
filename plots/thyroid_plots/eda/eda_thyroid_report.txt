@@ -1,0 +1,60 @@
+================================================================================
+THYROID CANCER DATASET – EXPLORATORY DATA ANALYSIS
+================================================================================
+
+DATA INFO:
+--------------------------------------------------------------------------------
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 383 entries, 0 to 382
+Data columns (total 17 columns):
+ #   Column                Non-Null Count  Dtype 
+---  ------                --------------  ----- 
+ 0   Age                   383 non-null    int64 
+ 1   Gender                383 non-null    object
+ 2   Smoking               383 non-null    object
+ 3   Hx Smoking            383 non-null    object
+ 4   Hx Radiothreapy       383 non-null    object
+ 5   Thyroid Function      383 non-null    object
+ 6   Physical Examination  383 non-null    object
+ 7   Adenopathy            383 non-null    object
+ 8   Pathology             383 non-null    object
+ 9   Focality              383 non-null    object
+ 10  Risk                  383 non-null    object
+ 11  T                     383 non-null    object
+ 12  N                     383 non-null    object
+ 13  M                     383 non-null    object
+ 14  Stage                 383 non-null    object
+ 15  Response              383 non-null    object
+ 16  Recurred              383 non-null    object
+dtypes: int64(1), object(16)
+memory usage: 51.0+ KB
+
+
+DATA DESCRIBE (NUMERIC FEATURES):
+--------------------------------------------------------------------------------
+              Age
+count  383.000000
+mean    40.866841
+std     15.134494
+min     15.000000
+25%     29.000000
+50%     37.000000
+75%     51.000000
+max     82.000000
+
+================================================================================
+NAIVE BASELINES (What to beat!)
+================================================================================
+
+Target Distribution (Recurred):
+----------------------------------------
+  No: 275 (71.80%)
+  Yes: 108 (28.20%)
+  Total: 383
+
+Baseline 1: Majority Class Classifier (always predict most frequent label)
+----------------------------------------
+  Majority label: No
+  Accuracy:       0.7180 (71.80%)
+
+Your models (XGBoost, Random Forest, Neural Net) should beat this accuracy.

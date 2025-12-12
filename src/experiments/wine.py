@@ -30,13 +30,11 @@ RANDOM_FOREST_NAME = "random_forest"
 NEURAL_NETWORK_NAME = "neural_network"
 
 
-def generate_boosting(train_df, test_df, random_state):
+def generate_boosting(train_df, test_df, random_state, predictors, target_col):
     """
     XGBoost classification on the Wine dataset (3 classes).
     Use a SMALLER grid than bank because the dataset is tiny (178 rows).
     """
-    target_col = "Class"
-    predictors = [c for c in train_df.columns if c != target_col]
 
     param_grid = {
         "model__n_estimators": [50, 100],
@@ -55,15 +53,14 @@ def generate_boosting(train_df, test_df, random_state):
         problem_type="classification",
         random_state=random_state,
         param_grid=param_grid,
+        scoring="f1_macro"
     )
 
     return results
 
 
-def generate_random_forest(train_df, test_df, random_state):
+def generate_random_forest(train_df, test_df, random_state, predictors, target_col):
     """Random Forest classification with a compact grid for the small Wine dataset."""
-    target_col = "Class"
-    predictors = [c for c in train_df.columns if c != target_col]
 
     param_grid = {
         "model__n_estimators": [100, 200],
@@ -81,18 +78,18 @@ def generate_random_forest(train_df, test_df, random_state):
         problem_type="classification",
         random_state=random_state,
         param_grid=param_grid,
+        scoring="f1_macro",
     )
 
     return results
 
 
-def generate_neural_network(train_df, test_df, random_state):
+def generate_neural_network(train_df, test_df, random_state, predictors, target_col):
     """
     Neural Network (MLP) classification.
     Use very small networks to avoid overfitting 178 samples.
     """
-    target_col = "Class"
-    predictors = [c for c in train_df.columns if c != target_col]
+
 
     hidden_layer_sizes_grid = [
         (16,),
@@ -115,6 +112,7 @@ def generate_neural_network(train_df, test_df, random_state):
         random_state=random_state,
         hidden_layer_sizes_grid=hidden_layer_sizes_grid,
         param_grid=param_grid,
+        scoring="f1_macro",
     )
 
     return results
@@ -133,6 +131,13 @@ def main():
 
     # 2. EDA (includes naive baseline)
     eda_wine(clean_df)
+
+    # IMPORTANT: "Class" is the target (values 1, 2, 3 for the three wine cultivars)
+    # "Alcohol" is a FEATURE, not the target!
+    target_col = "Class"
+    predictors = [c for c in clean_df.columns if c != target_col]
+    print(f"\n[wine.py] Target: {target_col} (wine cultivar: 1, 2, or 3)")
+    print(f"[wine.py] Predictors: {len(predictors)} features (including Alcohol, Malic_acid, etc.)")
 
     # 3. Experiment configuration
     split_configs = {
@@ -171,7 +176,7 @@ def main():
 
             # Boosting
             print(f"\n>>> Running XGBoost (Trial {trial + 1})...")
-            boosting_result = generate_boosting(train_df, test_df, rs)
+            boosting_result = generate_boosting(train_df, test_df, rs, predictors, target_col)
             boosting_record = {
                 "trial": trial,
                 "best_params": boosting_result["best_params"],
@@ -191,7 +196,7 @@ def main():
 
             # Random Forest
             print(f"\n>>> Running Random Forest (Trial {trial + 1})...")
-            rf_result = generate_random_forest(train_df, test_df, rs)
+            rf_result = generate_random_forest(train_df, test_df, rs, predictors, target_col)
             rf_record = {
                 "trial": trial,
                 "best_params": rf_result["best_params"],
@@ -217,7 +222,7 @@ def main():
 
             # Neural Network
             print(f"\n>>> Running Neural Network (Trial {trial + 1})...")
-            nn_result = generate_neural_network(train_df, test_df, rs)
+            nn_result = generate_neural_network(train_df, test_df, rs, predictors, target_col)
             nn_record = {
                 "trial": trial,
                 "best_params": nn_result["best_params"],
@@ -259,6 +264,10 @@ def main():
 
     comparison_dir = os.path.join(base_plots_dir, "comparison")
     plot_wine_model_comparison(results, comparison_dir)
+
+    print("\n" + "=" * 60)
+    print("WINE EXPERIMENT COMPLETE!")
+    print("=" * 60)
 
 
 if __name__ == "__main__":
