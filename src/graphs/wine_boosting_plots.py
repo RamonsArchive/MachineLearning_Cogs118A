@@ -1,0 +1,148 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+
+from sklearn.metrics import confusion_matrix, classification_report
+
+
+def plot_wine_boosting_summary(results_boosting, save_dir):
+    """
+    Plot summary for XGBoost (boosting) on the Wine dataset.
+
+    results_boosting: results["boosting"] from wine.py
+      {
+        "20_80": [ {trial_record}, {trial_record}, {trial_record} ],
+        "50_50": [...],
+        "80_20": [...]
+      }
+
+    Each trial_record must contain:
+      - "cv_train_score": float
+      - "cv_val_score": float
+      - "test_accuracy": float
+      - "test_metrics": dict (with "accuracy", "precision", "recall", "f1")
+      - "y_test": list
+      - "y_pred": list
+    """
+
+    os.makedirs(save_dir, exist_ok=True)
+
+    split_names = []
+    mean_train = []
+    mean_val = []
+    mean_test = []
+
+    best_model = None  # {"split_name": ..., "trial_index": ..., "record": ...}
+
+    for split_name, trials in results_boosting.items():
+        split_names.append(split_name)
+
+        train_scores = [t["cv_train_score"] for t in trials]
+        val_scores = [t["cv_val_score"] for t in trials]
+        test_accs = [t["test_accuracy"] for t in trials]
+
+        mean_train.append(np.mean(train_scores))
+        mean_val.append(np.mean(val_scores))
+        mean_test.append(np.mean(test_accs))
+
+        for idx, t in enumerate(trials):
+            if best_model is None or t["test_accuracy"] > best_model["record"]["test_accuracy"]:
+                best_model = {
+                    "split_name": split_name,
+                    "trial_index": idx,
+                    "record": t,
+                }
+
+    # Accuracy vs split
+    plt.figure(figsize=(8, 5))
+    plt.plot(split_names, mean_train, marker="o", linewidth=2, markersize=8, label="Train (CV mean)")
+    plt.plot(split_names, mean_val, marker="s", linewidth=2, markersize=8, label="Validation (CV mean)")
+    plt.plot(split_names, mean_test, marker="^", linewidth=2, markersize=8, label="Test (mean of trials)")
+    plt.xlabel("Train/Test Split", fontsize=11)
+    plt.ylabel("Accuracy", fontsize=11)
+    plt.title("Wine Dataset – XGBoost: Accuracy vs Train/Test Split", fontsize=12)
+    plt.legend(loc="best")
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(os.path.join(save_dir, "wine_boosting_accuracy.png"), dpi=150, bbox_inches="tight")
+    plt.close()
+
+    # Confusion matrix for best model
+    if best_model is not None:
+        rec = best_model["record"]
+        y_test = np.array(rec["y_test"])
+        y_pred = np.array(rec["y_pred"])
+
+        cm = confusion_matrix(y_test, y_pred)
+        classes = np.unique(y_test)
+
+        plt.figure(figsize=(6, 5))
+        im = plt.imshow(cm, interpolation="nearest", cmap="Blues")
+        plt.title("Wine Dataset – XGBoost Confusion Matrix (best model)", fontsize=12)
+        plt.colorbar(im)
+        tick_marks = np.arange(len(classes))
+        plt.xticks(tick_marks, classes, fontsize=10)
+        plt.yticks(tick_marks, classes, fontsize=10)
+        plt.xlabel("Predicted label", fontsize=11)
+        plt.ylabel("True label", fontsize=11)
+
+        thresh = cm.max() / 2.0
+        for i in range(cm.shape[0]):
+            for j in range(cm.shape[1]):
+                plt.text(
+                    j,
+                    i,
+                    format(cm[i, j], "d"),
+                    ha="center",
+                    va="center",
+                    fontsize=12,
+                    fontweight="bold",
+                    color="white" if cm[i, j] > thresh else "black",
+                )
+        plt.tight_layout()
+        plt.savefig(os.path.join(save_dir, "wine_boosting_confusion_best_model.png"), dpi=150, bbox_inches="tight")
+        plt.close()
+
+    # Text report
+    report_path = os.path.join(save_dir, "wine_boosting_report.txt")
+    with open(report_path, "w") as f:
+        f.write("Wine Dataset – XGBoost (Boosting) Summary Report\n")
+        f.write("=" * 70 + "\n\n")
+
+        f.write("PERFORMANCE BY SPLIT (averaged over 3 trials)\n")
+        f.write("-" * 70 + "\n")
+        for i, split_name in enumerate(split_names):
+            f.write(
+                f"{split_name:<10} "
+                f"Train (CV) = {mean_train[i]:.4f}, "
+                f"Val (CV) = {mean_val[i]:.4f}, "
+                f"Test Acc = {mean_test[i]:.4f}\n"
+            )
+        f.write("\n")
+
+        if best_model is not None:
+            split_name = best_model["split_name"]
+            idx = best_model["trial_index"]
+            rec = best_model["record"]
+
+            f.write("Best model (by test accuracy):\n")
+            f.write("-" * 70 + "\n")
+            f.write(f"  Split: {split_name}\n")
+            f.write(f"  Trial index: {idx}\n")
+            f.write(f"  Best params: {rec.get('best_params', {})}\n\n")
+
+            tm = rec["test_metrics"]
+            f.write("  Test metrics:\n")
+            for k, v in tm.items():
+                f.write(f"    {k}: {v:.4f}\n")
+
+            y_test = np.array(rec["y_test"])
+            y_pred = np.array(rec["y_pred"])
+            f.write("\nClassification report (test set):\n")
+            f.write(classification_report(y_test, y_pred))
+        else:
+            f.write("No best model found (no trials?)\n")
+
+    print(f"[wine_boosting_plots] Saved plots and report to {save_dir}")
+
+

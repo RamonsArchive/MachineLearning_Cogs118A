@@ -192,7 +192,7 @@ def main():
         BOOSTING_NAME: {},
         RANDOM_FOREST_NAME: {},
         NEURAL_NETWORK_NAME: {},
-        SVM_NAME: {},
+       #  SVM_NAME: {},
     }
 
     # Train/test split configs (train/test)

@@ -8,9 +8,9 @@ PERFORMANCE BY SPLIT (averaged over 3 trials)
 
 Split      CV Train     CV Val       Test R2      Test RMSE    Test MAE    
 ----------------------------------------------------------------------
-20_80      -0.0157      -11.1489      0.9212      2.9893       1.8357
-50_50      -0.0314      -4.1371      0.9686      1.8726       0.9134
-80_20      -0.0364      -2.7559      0.9797      1.4798       0.6343
+20_80      -0.0013      -11.1116      0.9215      2.9828       1.8298
+50_50      -0.0054      -4.0992      0.9689      1.8629       0.9038
+80_20      -0.0052      -2.7146      0.9811      1.4303       0.6072
 
 --------------------------------------------------
 BEST MODEL (highest R2)
@@ -21,20 +21,20 @@ Trial: 1
 Best Parameters:
   model__learning_rate: 0.01
   model__max_depth: 10
-  model__n_estimators: 800
+  model__n_estimators: 1200
   model__reg_alpha: 0
   model__reg_lambda: 1
   model__subsample: 0.8
 
 Test Metrics:
-  R2:   0.9828
-  RMSE: 1.3794 degC
-  MAE:  0.6036 degC
-  MSE:  1.902754
+  R2:   0.9831
+  RMSE: 1.3674 degC
+  MAE:  0.5923 degC
+  MSE:  1.869787
 
 --------------------------------------------------
 INTERPRETATION
 --------------------------------------------------
-Model Quality: EXCELLENT (R2 = 0.9828)
+Model Quality: EXCELLENT (R2 = 0.9831)
 The model explains 98.3% of variance in UPDRS scores.
-Average prediction error: +/- 0.604 degC
+Average prediction error: +/- 0.592 degC
