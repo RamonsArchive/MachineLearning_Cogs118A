@@ -3,36 +3,36 @@ Thyroid Cancer Dataset – Neural Network (MLP) Summary Report
 
 PERFORMANCE BY SPLIT (averaged over 3 trials)
 ----------------------------------------------------------------------
-20_80      Train (CV) = 0.7699, Val (CV) = 0.6832, Test Acc = 0.9197
-50_50      Train (CV) = 0.9163, Val (CV) = 0.8662, Test Acc = 0.9323
-80_20      Train (CV) = 0.9428, Val (CV) = 0.9025, Test Acc = 0.9610
+20_80      Train (CV) = 0.9660, Val (CV) = 0.9555, Test Acc = 0.9045
+50_50      Train (CV) = 0.9874, Val (CV) = 0.9734, Test Acc = 0.9497
+80_20      Train (CV) = 0.9911, Val (CV) = 0.9813, Test Acc = 0.9654
 
 Best model (by ROC-AUC):
 ----------------------------------------------------------------------
-  Split: 80_20
-  Trial index: 2
-  Best params: {'model__alpha': 0.0001, 'model__batch_size': 16, 'model__hidden_layer_sizes': (32,), 'model__learning_rate_init': 0.01}
+  Split: 50_50
+  Trial index: 0
+  Best params: {'model__alpha': 0.001, 'model__batch_size': 16, 'model__hidden_layer_sizes': (16, 8), 'model__learning_rate_init': 0.01}
 
   Test metrics:
-    accuracy: 0.9740
-    precision: 1.0000
-    recall: 0.9091
-    f1: 0.9524
-    roc_auc: 0.9934
+    accuracy: 0.9635
+    precision: 0.9434
+    recall: 0.9259
+    f1: 0.9346
+    roc_auc: 0.9917
 
-  ROC-AUC used in ROC plot: 0.9934
+  ROC-AUC used in ROC plot: 0.9917
 
   Training details:
-    Architecture: (32,)
-    Iterations:  19
-    Final loss:  0.021993
+    Architecture: (16, 8)
+    Iterations:  32
+    Final loss:  0.005159
 
 Classification report (test set):
               precision    recall  f1-score   support
 
-           0       0.96      1.00      0.98        55
-           1       1.00      0.91      0.95        22
+           0       0.97      0.98      0.97       138
+           1       0.94      0.93      0.93        54
 
-    accuracy                           0.97        77
-   macro avg       0.98      0.95      0.97        77
-weighted avg       0.97      0.97      0.97        77
+    accuracy                           0.96       192
+   macro avg       0.96      0.95      0.95       192
+weighted avg       0.96      0.96      0.96       192

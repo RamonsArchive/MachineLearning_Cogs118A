@@ -4,30 +4,30 @@ Thyroid Cancer Dataset – Random Forest Summary Report
 PERFORMANCE BY SPLIT (averaged over 3 trials)
 ----------------------------------------------------------------------
 20_80      Train (CV) = 0.9424, Val (CV) = 0.8793, Test Acc = 0.9229
-50_50      Train (CV) = 0.9807, Val (CV) = 0.9002, Test Acc = 0.9583
-80_20      Train (CV) = 0.9879, Val (CV) = 0.9389, Test Acc = 0.9610
+50_50      Train (CV) = 0.9954, Val (CV) = 0.9004, Test Acc = 0.9670
+80_20      Train (CV) = 0.9937, Val (CV) = 0.9369, Test Acc = 0.9610
 
 Best model (by ROC-AUC):
 ----------------------------------------------------------------------
   Split: 50_50
   Trial index: 0
-  Best params: {'model__max_depth': 5, 'model__max_features': 'sqrt', 'model__min_samples_leaf': 1, 'model__min_samples_split': 2, 'model__n_estimators': 100}
+  Best params: {'model__max_depth': None, 'model__max_features': 'sqrt', 'model__min_samples_leaf': 1, 'model__min_samples_split': 3, 'model__n_estimators': 200}
 
   Test metrics:
-    accuracy: 0.9740
-    precision: 0.9623
-    recall: 0.9444
-    f1: 0.9533
-    roc_auc: 0.9969
+    accuracy: 0.9688
+    precision: 1.0000
+    recall: 0.8889
+    f1: 0.9412
+    roc_auc: 0.9975
 
-  ROC-AUC used in ROC plot: 0.9969
+  ROC-AUC used in ROC plot: 0.9975
 
 Classification report (test set):
               precision    recall  f1-score   support
 
-           0       0.98      0.99      0.98       138
-           1       0.96      0.94      0.95        54
+           0       0.96      1.00      0.98       138
+           1       1.00      0.89      0.94        54
 
     accuracy                           0.97       192
-   macro avg       0.97      0.96      0.97       192
+   macro avg       0.98      0.94      0.96       192
 weighted avg       0.97      0.97      0.97       192

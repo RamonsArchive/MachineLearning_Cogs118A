@@ -3,9 +3,9 @@ Wine Dataset – XGBoost (Boosting) Summary Report
 
 PERFORMANCE BY SPLIT (averaged over 3 trials)
 ----------------------------------------------------------------------
-20_80      Train (CV) = 1.0000, Val (CV) = 0.8792, Test Acc = 0.9487
-50_50      Train (CV) = 1.0000, Val (CV) = 0.9587, Test Acc = 0.9663
-80_20      Train (CV) = 1.0000, Val (CV) = 0.9696, Test Acc = 0.9907
+20_80      Train (CV) = 1.0000, Val (CV) = 0.8787, Test Acc = 0.9487
+50_50      Train (CV) = 1.0000, Val (CV) = 0.9599, Test Acc = 0.9700
+80_20      Train (CV) = 1.0000, Val (CV) = 0.9707, Test Acc = 0.9907
 
 Best model (by test accuracy):
 ----------------------------------------------------------------------
