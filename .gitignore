@@ -37,6 +37,12 @@ Thumbs.db
 # Jupyter Notebook
 .ipynb_checkpoints
 
+# Executable files (especially large installers)
+*.exe
+*.msi
+*.dmg
+*.pkg
+
 # Data files (optional - uncomment if you want to ignore CSV files too)
 # *.csv
 

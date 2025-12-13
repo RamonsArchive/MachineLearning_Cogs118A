@@ -1,4 +1,4 @@
-Wine Dataset – XGBoost (Boosting) Summary Report
+Wine Dataset ï¿½ XGBoost (Boosting) Summary Report
 ======================================================================
 
 PERFORMANCE BY SPLIT (averaged over 3 trials)
