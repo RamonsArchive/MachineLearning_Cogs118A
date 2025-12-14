@@ -30,7 +30,9 @@ def plot_wine_boosting_summary(results_boosting, save_dir):
     split_names = []
     mean_train = []
     mean_val = []
-    mean_test = []
+    mean_test_acc = []
+    mean_test_f1 = []
+    mean_test_roc_auc = []
 
     best_model = None  # {"split_name": ..., "trial_index": ..., "record": ...}
 
@@ -39,11 +41,15 @@ def plot_wine_boosting_summary(results_boosting, save_dir):
 
         train_scores = [t["cv_train_score"] for t in trials]
         val_scores = [t["cv_val_score"] for t in trials]
-        test_accs = [t["test_accuracy"] for t in trials]
+        test_accs = [t["test_metrics"]["accuracy"] for t in trials]
+        test_f1s = [t["test_metrics"]["f1"] for t in trials]
+        test_roc_aucs = [t["test_metrics"].get("roc_auc", 0) for t in trials]  # May not exist for multiclass
 
         mean_train.append(np.mean(train_scores))
         mean_val.append(np.mean(val_scores))
-        mean_test.append(np.mean(test_accs))
+        mean_test_acc.append(np.mean(test_accs))
+        mean_test_f1.append(np.mean(test_f1s))
+        mean_test_roc_auc.append(np.mean(test_roc_aucs) if any(test_roc_aucs) else 0)
 
         for idx, t in enumerate(trials):
             if best_model is None or t["test_accuracy"] > best_model["record"]["test_accuracy"]:
@@ -57,7 +63,7 @@ def plot_wine_boosting_summary(results_boosting, save_dir):
     plt.figure(figsize=(8, 5))
     plt.plot(split_names, mean_train, marker="o", linewidth=2, markersize=8, label="Train (CV mean)")
     plt.plot(split_names, mean_val, marker="s", linewidth=2, markersize=8, label="Validation (CV mean)")
-    plt.plot(split_names, mean_test, marker="^", linewidth=2, markersize=8, label="Test (mean of trials)")
+    plt.plot(split_names, mean_test_acc, marker="^", linewidth=2, markersize=8, label="Test (mean of trials)")
     plt.xlabel("Train/Test Split", fontsize=11)
     plt.ylabel("Accuracy", fontsize=11)
     plt.title("Wine Dataset – XGBoost: Accuracy vs Train/Test Split", fontsize=12)
@@ -111,12 +117,17 @@ def plot_wine_boosting_summary(results_boosting, save_dir):
 
         f.write("PERFORMANCE BY SPLIT (averaged over 3 trials)\n")
         f.write("-" * 70 + "\n")
+        f.write(f"{'Split':<10} {'CV Train':<12} {'CV Val':<12} {'Test Acc':<12} {'Test F1':<12} {'Test ROC-AUC':<12}\n")
+        f.write("-" * 70 + "\n")
         for i, split_name in enumerate(split_names):
+            roc_auc_str = f"{mean_test_roc_auc[i]:.4f}" if mean_test_roc_auc[i] > 0 else "N/A"
             f.write(
                 f"{split_name:<10} "
-                f"Train (CV) = {mean_train[i]:.4f}, "
-                f"Val (CV) = {mean_val[i]:.4f}, "
-                f"Test Acc = {mean_test[i]:.4f}\n"
+                f"{mean_train[i]:<12.4f} "
+                f"{mean_val[i]:<12.4f} "
+                f"{mean_test_acc[i]:<12.4f} "
+                f"{mean_test_f1[i]:<12.4f} "
+                f"{roc_auc_str:<12}\n"
             )
         f.write("\n")
 

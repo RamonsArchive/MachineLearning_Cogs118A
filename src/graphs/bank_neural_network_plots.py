@@ -44,7 +44,9 @@ def plot_bank_neural_network_summary(results_nn, save_dir):
     split_names = []
     mean_train = []
     mean_val = []
-    mean_test = []
+    mean_test_acc = []
+    mean_test_f1 = []
+    mean_test_roc_auc = []
 
     # Also keep overall-best model for ROC/confusion matrix
     best_model = None
@@ -55,10 +57,14 @@ def plot_bank_neural_network_summary(results_nn, save_dir):
         train_scores = [t["cv_train_score"] for t in trials]  # ROC-AUC
         val_scores = [t["cv_val_score"] for t in trials]      # ROC-AUC
         test_roc_aucs = [t["test_metrics"]["roc_auc"] for t in trials]  # ROC-AUC (consistent!)
+        test_accs = [t["test_metrics"]["accuracy"] for t in trials]
+        test_f1s = [t["test_metrics"]["f1"] for t in trials]
 
         mean_train.append(np.mean(train_scores))
         mean_val.append(np.mean(val_scores))
-        mean_test.append(np.mean(test_roc_aucs))
+        mean_test_acc.append(np.mean(test_accs))
+        mean_test_f1.append(np.mean(test_f1s))
+        mean_test_roc_auc.append(np.mean(test_roc_aucs))
 
         # Track best test ROC-AUC across all splits/trials
         for idx, t in enumerate(trials):
@@ -73,7 +79,7 @@ def plot_bank_neural_network_summary(results_nn, save_dir):
     plt.figure(figsize=(8, 5))
     plt.plot(split_names, mean_train, marker="o", linewidth=2, markersize=8, label="Train (CV mean)")
     plt.plot(split_names, mean_val, marker="s", linewidth=2, markersize=8, label="Validation (CV mean)")
-    plt.plot(split_names, mean_test, marker="^", linewidth=2, markersize=8, label="Test (mean of trials)")
+    plt.plot(split_names, mean_test_roc_auc, marker="^", linewidth=2, markersize=8, label="Test (mean of trials)")
     plt.xlabel("Train/Test Split", fontsize=11)
     plt.ylabel("Score", fontsize=11)
     plt.title("Bank Dataset – Neural Network: Performance vs Train/Test Split", fontsize=12)
@@ -202,11 +208,16 @@ def plot_bank_neural_network_summary(results_nn, save_dir):
 
         f.write("PERFORMANCE BY SPLIT (averaged over 3 trials)\n")
         f.write("-" * 70 + "\n")
-        f.write(f"{'Split':<12} {'Train (CV)':<15} {'Val (CV)':<15} {'Test':<15}\n")
+        f.write(f"{'Split':<12} {'CV Train':<12} {'CV Val':<12} {'Test Acc':<12} {'Test F1':<12} {'Test ROC-AUC':<12}\n")
         f.write("-" * 70 + "\n")
         for i, split_name in enumerate(split_names):
             f.write(
-                f"{split_name:<12} {mean_train[i]:<15.4f} {mean_val[i]:<15.4f} {mean_test[i]:<15.4f}\n"
+                f"{split_name:<12} "
+                f"{mean_train[i]:<12.4f} "
+                f"{mean_val[i]:<12.4f} "
+                f"{mean_test_acc[i]:<12.4f} "
+                f"{mean_test_f1[i]:<12.4f} "
+                f"{mean_test_roc_auc[i]:<12.4f}\n"
             )
         f.write("\n")
 
@@ -215,7 +226,7 @@ def plot_bank_neural_network_summary(results_nn, save_dir):
         f.write("-" * 70 + "\n")
         for i, split_name in enumerate(split_names):
             overfit_gap = mean_train[i] - mean_val[i]
-            generalization_gap = mean_val[i] - mean_test[i]
+            generalization_gap = mean_val[i] - mean_test_roc_auc[i]
             f.write(f"Split {split_name}:\n")
             f.write(f"  Train-Val gap: {overfit_gap:+.4f} (>0.05 suggests overfitting)\n")
             f.write(f"  Val-Test gap:  {generalization_gap:+.4f}\n")

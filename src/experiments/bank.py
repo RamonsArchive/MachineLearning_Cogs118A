@@ -29,7 +29,7 @@ RANDOM_STATE = 42
 BOOSTING_NAME = "boosting"
 RANDOM_FOREST_NAME = "random_forest"
 NEURAL_NETWORK_NAME = "neural_network"
-SVM_NAME = "svm"
+# SVM_NAME = "svm"
 
 def generate_boosting(train_df, test_df, RANDOM_STATE):
     """
@@ -213,7 +213,7 @@ def main():
         results[BOOSTING_NAME][split_name] = []
         results[RANDOM_FOREST_NAME][split_name] = []
         results[NEURAL_NETWORK_NAME][split_name] = []
-        results[SVM_NAME][split_name] = []
+        # results[SVM_NAME][split_name] = []
 
         for trial in range(n_trials):
             # Different random_state per trial so splits differ

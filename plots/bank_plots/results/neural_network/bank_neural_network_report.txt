@@ -1,5 +1,5 @@
 ======================================================================
-Bank Dataset ï¿½ Neural Network (MLP) Summary Report
+Bank Dataset – Neural Network (MLP) Summary Report
 ======================================================================
 
 OVERVIEW

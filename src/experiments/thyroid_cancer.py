@@ -101,6 +101,7 @@ def generate_neural_network(train_df, test_df, random_state, predictors, target_
         random_state=random_state,
         hidden_layer_sizes_grid=hidden_layer_sizes_grid,
         param_grid=param_grid,
+        scoring="f1",
     )
 
 

@@ -39,16 +39,26 @@ def plot_bank_boosting_summary(results_boosting, save_dir):
     # Also keep overall-best model for ROC/confusion matrix
     best_model = None  # dict: {"split_name": ..., "trial_index": ..., "record": ...}
 
+    # Also collect averages for accuracy, F1, ROC-AUC
+    mean_test_acc = []
+    mean_test_f1 = []
+    mean_test_roc_auc = []
+
     for split_name, trials in results_boosting.items():
         split_names.append(split_name)
 
         train_scores = [t["cv_train_score"] for t in trials]  # ROC-AUC
         val_scores = [t["cv_val_score"] for t in trials]      # ROC-AUC
         test_roc_aucs = [t["test_metrics"]["roc_auc"] for t in trials]  # ROC-AUC (consistent!)
+        test_accs = [t["test_metrics"]["accuracy"] for t in trials]
+        test_f1s = [t["test_metrics"]["f1"] for t in trials]
 
         mean_train.append(np.mean(train_scores))
         mean_val.append(np.mean(val_scores))
         mean_test.append(np.mean(test_roc_aucs))
+        mean_test_acc.append(np.mean(test_accs))
+        mean_test_f1.append(np.mean(test_f1s))
+        mean_test_roc_auc.append(np.mean(test_roc_aucs))
 
         # Track best test ROC-AUC across all splits/trials
         for idx, t in enumerate(trials):
@@ -142,15 +152,19 @@ def plot_bank_boosting_summary(results_boosting, save_dir):
         f.write("Bank Dataset – Boosting Summary Report\n")
         f.write("======================================\n\n")
 
-        f.write("Mean ROC-AUC by split (averaged over 3 trials):\n")
+        f.write("PERFORMANCE BY SPLIT (averaged over 3 trials)\n")
+        f.write("-" * 70 + "\n")
+        f.write(f"{'Split':<10} {'CV Train':<12} {'CV Val':<12} {'Test Acc':<12} {'Test F1':<12} {'Test ROC-AUC':<12}\n")
+        f.write("-" * 70 + "\n")
         for i, split_name in enumerate(split_names):
             f.write(
-                f"  Split {split_name}: "
-                f"Train (CV) = {mean_train[i]:.4f}, "
-                f"Val (CV) = {mean_val[i]:.4f}, "
-                f"Test = {mean_test[i]:.4f}\n"
+                f"{split_name:<10} "
+                f"{mean_train[i]:<12.4f} "
+                f"{mean_val[i]:<12.4f} "
+                f"{mean_test_acc[i]:<12.4f} "
+                f"{mean_test_f1[i]:<12.4f} "
+                f"{mean_test_roc_auc[i]:<12.4f}\n"
             )
-
         f.write("\n(Train vs Val/Test gives a sense of overfitting.\n")
         f.write(" If Train >> Val/Test, model is likely overfitting.)\n\n")
 
