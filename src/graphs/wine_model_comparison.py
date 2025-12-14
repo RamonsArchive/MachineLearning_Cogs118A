@@ -19,22 +19,22 @@ def plot_wine_model_comparison(all_results, save_dir):
     model_names = list(all_results.keys())
     splits = list(next(iter(all_results.values())).keys())
 
-    # Build bar chart of mean test accuracy per model per split
+    # Build bar chart of mean test F1 score per model per split
     x = np.arange(len(splits))
     width = 0.25
     colors = ["#2563eb", "#10b981", "#7c3aed"]
 
     plt.figure(figsize=(10, 6))
     for i, model in enumerate(model_names):
-        mean_acc = []
+        mean_f1 = []
         for split in splits:
-            accs = [t["test_accuracy"] for t in all_results[model][split]]
-            mean_acc.append(np.mean(accs))
-        plt.bar(x + (i - 1) * width, mean_acc, width, label=model.replace("_", " ").title(), color=colors[i % len(colors)])
+            f1s = [t["test_metrics"]["f1"] for t in all_results[model][split]]
+            mean_f1.append(np.mean(f1s))
+        plt.bar(x + (i - 1) * width, mean_f1, width, label=model.replace("_", " ").title(), color=colors[i % len(colors)])
 
     plt.xlabel("Train/Test Split", fontsize=12)
-    plt.ylabel("Test Accuracy", fontsize=12)
-    plt.title("Wine Dataset – Model Comparison (Accuracy)", fontsize=14)
+    plt.ylabel("Test F1 Score", fontsize=12)
+    plt.title("Wine Dataset – Model Comparison (F1 Score)", fontsize=14)
     plt.xticks(x, splits)
     plt.ylim(0, 1)
     plt.legend()
@@ -52,26 +52,26 @@ def plot_wine_model_comparison(all_results, save_dir):
         for split in splits:
             f.write(f"Split {split}:\n")
             for model in model_names:
-                accs = [t["test_accuracy"] for t in all_results[model][split]]
-                f.write(f"  {model}: mean={np.mean(accs):.4f}, std={np.std(accs):.4f}\n")
+                f1s = [t["test_metrics"]["f1"] for t in all_results[model][split]]
+                f.write(f"  {model}: mean={np.mean(f1s):.4f}, std={np.std(f1s):.4f}\n")
             f.write("\n")
 
-        # Best model overall by mean accuracy across splits
+        # Best model overall by mean F1 score across splits
         best_model = None
         best_score = -np.inf
         for model in model_names:
-            accs_all = []
+            f1s_all = []
             for split in splits:
-                accs_all.extend([t["test_accuracy"] for t in all_results[model][split]])
-            mean_acc = np.mean(accs_all)
-            if mean_acc > best_score:
-                best_score = mean_acc
+                f1s_all.extend([t["test_metrics"]["f1"] for t in all_results[model][split]])
+            mean_f1 = np.mean(f1s_all)
+            if mean_f1 > best_score:
+                best_score = mean_f1
                 best_model = model
 
-        f.write("Best overall model by mean test accuracy:\n")
+        f.write("Best overall model by mean test F1 score:\n")
         f.write("-" * 70 + "\n")
         f.write(f"  Model: {best_model}\n")
-        f.write(f"  Mean accuracy: {best_score:.4f}\n")
+        f.write(f"  Mean F1: {best_score:.4f}\n")
 
     print(f"[wine_model_comparison] Saved comparison plot and report to {save_dir}")
 

@@ -39,7 +39,7 @@ def plot_wine_neural_network_summary(results_nn, save_dir):
         mean_test_roc_auc.append(np.mean(test_roc_aucs) if any(test_roc_aucs) else 0)
 
         for idx, t in enumerate(trials):
-            if best_model is None or t["test_accuracy"] > best_model["record"]["test_accuracy"]:
+            if best_model is None or t["test_metrics"]["f1"] > best_model["record"]["test_metrics"]["f1"]:
                 best_model = {
                     "split_name": split_name,
                     "trial_index": idx,
@@ -123,7 +123,7 @@ def plot_wine_neural_network_summary(results_nn, save_dir):
             idx = best_model["trial_index"]
             rec = best_model["record"]
 
-            f.write("Best model (by test accuracy):\n")
+            f.write("Best model (by test F1 score):\n")
             f.write("-" * 70 + "\n")
             f.write(f"  Split: {split_name}\n")
             f.write(f"  Trial index: {idx}\n")

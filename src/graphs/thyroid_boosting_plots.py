@@ -39,7 +39,7 @@ def plot_thyroid_boosting_summary(results_boosting, save_dir):
         mean_test_roc_auc.append(np.mean(test_roc_aucs))
 
         for idx, t in enumerate(trials):
-            if best_model is None or t["test_metrics"]["roc_auc"] > best_model["record"]["test_metrics"]["roc_auc"]:
+            if best_model is None or t["test_metrics"]["f1"] > best_model["record"]["test_metrics"]["f1"]:
                 best_model = {
                     "split_name": split_name,
                     "trial_index": idx,
@@ -147,7 +147,7 @@ def plot_thyroid_boosting_summary(results_boosting, save_dir):
             idx = best_model["trial_index"]
             rec = best_model["record"]
 
-            f.write("Best model (by ROC-AUC):\n")
+            f.write("Best model (by test F1 score):\n")
             f.write("-" * 70 + "\n")
             f.write(f"  Split: {split_name}\n")
             f.write(f"  Trial index: {idx}\n")

@@ -66,9 +66,9 @@ def plot_bank_neural_network_summary(results_nn, save_dir):
         mean_test_f1.append(np.mean(test_f1s))
         mean_test_roc_auc.append(np.mean(test_roc_aucs))
 
-        # Track best test ROC-AUC across all splits/trials
+        # Track best test F1 score across all splits/trials
         for idx, t in enumerate(trials):
-            if best_model is None or t["test_metrics"]["roc_auc"] > best_model["record"]["test_metrics"]["roc_auc"]:
+            if best_model is None or t["test_metrics"]["f1"] > best_model["record"]["test_metrics"]["f1"]:
                 best_model = {
                     "split_name": split_name,
                     "trial_index": idx,
@@ -237,7 +237,7 @@ def plot_bank_neural_network_summary(results_nn, save_dir):
             idx = best_model["trial_index"]
             rec = best_model["record"]
 
-            f.write("BEST MODEL (by test ROC-AUC)\n")
+            f.write("BEST MODEL (by test F1 score)\n")
             f.write("-" * 70 + "\n")
             f.write(f"Split: {split_name}\n")
             f.write(f"Trial: {idx}\n")

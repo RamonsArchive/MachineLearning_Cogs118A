@@ -20,10 +20,8 @@ def plot_thyroid_model_comparison(all_results, save_dir):
     splits = list(next(iter(all_results.values())).keys())
 
     def metric_from_trial(t):
-        roc = t["test_metrics"].get("roc_auc", np.nan)
-        if np.isnan(roc):
-            return t["test_metrics"].get("accuracy", np.nan)
-        return roc
+        # Use F1 score as primary metric
+        return t["test_metrics"].get("f1", np.nan)
 
     # Bar chart of mean ROC-AUC (or accuracy) per model per split
     x = np.arange(len(splits))
@@ -39,7 +37,7 @@ def plot_thyroid_model_comparison(all_results, save_dir):
         plt.bar(x + (i - 1) * width, mean_scores, width, label=model.replace("_", " ").title(), color=colors[i % len(colors)])
 
     plt.xlabel("Train/Test Split", fontsize=12)
-    plt.ylabel("Test ROC-AUC (fallback: Accuracy)", fontsize=12)
+    plt.ylabel("Test F1 Score", fontsize=12)
     plt.title("Thyroid Cancer – Model Comparison", fontsize=14)
     plt.xticks(x, splits)
     plt.ylim(0, 1)
@@ -73,10 +71,10 @@ def plot_thyroid_model_comparison(all_results, save_dir):
                 best_score = mean_score
                 best_model = model
 
-        f.write("Best overall model by mean ROC-AUC (fallback accuracy):\n")
+        f.write("Best overall model by mean test F1 score:\n")
         f.write("-" * 70 + "\n")
         f.write(f"  Model: {best_model}\n")
-        f.write(f"  Mean score: {best_score:.4f}\n")
+        f.write(f"  Mean F1: {best_score:.4f}\n")
 
     print(f"[thyroid_model_comparison] Saved comparison plot and report to {save_dir}")
 

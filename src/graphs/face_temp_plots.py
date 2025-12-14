@@ -23,7 +23,7 @@ def _generate_regression_report(results, model_name, output_dir):
     mean_test_rmse = []
     mean_test_mae = []
     
-    best_r2 = -float('inf')
+    best_rmse = float('inf')
     best_split = None
     best_trial = None
     
@@ -42,10 +42,10 @@ def _generate_regression_report(results, model_name, output_dir):
         mean_test_rmse.append(np.mean(test_rmses))
         mean_test_mae.append(np.mean(test_maes))
         
-        # Find best trial
+        # Find best trial (lowest RMSE)
         for trial in trials:
-            if trial["test_metrics"]["r2"] > best_r2:
-                best_r2 = trial["test_metrics"]["r2"]
+            if trial["test_metrics"]["rmse"] < best_rmse:
+                best_rmse = trial["test_metrics"]["rmse"]
                 best_split = split_name
                 best_trial = trial
     
@@ -69,7 +69,7 @@ def _generate_regression_report(results, model_name, output_dir):
     # Best Model Details
     if best_trial:
         report_lines.append("\n" + "-" * 50)
-        report_lines.append("BEST MODEL (highest R2)")
+        report_lines.append("BEST MODEL (lowest RMSE)")
         report_lines.append("-" * 50)
         report_lines.append(f"Split: {best_split}")
         report_lines.append(f"Trial: {best_trial['trial'] + 1}")
@@ -456,13 +456,13 @@ def plot_face_temp_model_comparison(all_results, output_dir):
     report_lines.append("-" * 60)
     
     best_model = None
-    best_r2 = -float('inf')
+    best_rmse = float('inf')
     
     for model in model_names:
         for split in splits:
             for trial in all_results[model][split]:
-                if trial["test_metrics"]["r2"] > best_r2:
-                    best_r2 = trial["test_metrics"]["r2"]
+                if trial["test_metrics"]["rmse"] < best_rmse:
+                    best_rmse = trial["test_metrics"]["rmse"]
                     best_model = model
                     best_split = split
                     best_trial_info = trial
@@ -470,8 +470,8 @@ def plot_face_temp_model_comparison(all_results, output_dir):
     if best_model:
         report_lines.append(f"Model: {best_model}")
         report_lines.append(f"Split: {best_split}")
-        report_lines.append(f"R2:    {best_r2:.4f}")
-        report_lines.append(f"RMSE:  {best_trial_info['test_metrics']['rmse']:.4f} degC")
+        report_lines.append(f"RMSE:  {best_rmse:.4f} degC")
+        report_lines.append(f"R2:    {best_trial_info['test_metrics']['r2']:.4f}")
         report_lines.append(f"MAE:   {best_trial_info['test_metrics']['mae']:.4f} degC")
     
     # Save comparison report

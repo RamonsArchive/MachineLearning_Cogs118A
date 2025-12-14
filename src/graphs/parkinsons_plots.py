@@ -8,31 +8,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def _compute_split_averages(split_results):
-    """Compute average metrics across trials for a split."""
-    if not split_results:
-        return {}
-    
-    metrics = {
-        "cv_train_score": [],
-        "cv_val_score": [],
-        "test_mse": [],
-        "test_rmse": [],
-        "test_mae": [],
-        "test_r2": [],
-    }
-    
-    for trial in split_results:
-        metrics["cv_train_score"].append(trial["cv_train_score"])
-        metrics["cv_val_score"].append(trial["cv_val_score"])
-        metrics["test_mse"].append(trial["test_metrics"]["mse"])
-        metrics["test_rmse"].append(trial["test_metrics"]["rmse"])
-        metrics["test_mae"].append(trial["test_metrics"]["mae"])
-        metrics["test_r2"].append(trial["test_metrics"]["r2"])
-    
-    return {k: (np.mean(v), np.std(v)) for k, v in metrics.items()}
-
-
 def _generate_regression_report(results, model_name, output_dir):
     """Generate text report for a regression model."""
     report_lines = []
@@ -47,33 +22,61 @@ def _generate_regression_report(results, model_name, output_dir):
     report_lines.append(f"\n{'Split':<10} {'CV Train':<12} {'CV Val':<12} {'Test R2':<12} {'Test RMSE':<12} {'Test MAE':<12}")
     report_lines.append("-" * 70)
     
-    best_r2 = -float('inf')
+    # Collect means across splits (same structure as classification plots)
+    split_names = []
+    mean_train = []
+    mean_val = []
+    mean_test_r2 = []
+    mean_test_rmse = []
+    mean_test_mae = []
+    
+    best_rmse = float('inf')
     best_split = None
     best_trial = None
     
     for split_name, trials in results.items():
-        avg = _compute_split_averages(trials)
+        split_names.append(split_name)
         
-        report_lines.append(
-            f"{split_name:<10} "
-            f"{avg['cv_train_score'][0]:.4f}      "
-            f"{avg['cv_val_score'][0]:.4f}      "
-            f"{avg['test_r2'][0]:.4f}      "
-            f"{avg['test_rmse'][0]:.4f}       "
-            f"{avg['test_mae'][0]:.4f}"
-        )
+        train_scores = [t["cv_train_score"] for t in trials]
+        val_scores = [t["cv_val_score"] for t in trials]
+        test_r2s = [t["test_metrics"]["r2"] for t in trials]
+        test_rmses = [t["test_metrics"]["rmse"] for t in trials]
+        test_maes = [t["test_metrics"]["mae"] for t in trials]
         
-        # Find best trial
+        mean_train.append(np.mean(train_scores))
+        mean_val.append(np.mean(val_scores))
+        mean_test_r2.append(np.mean(test_r2s))
+        mean_test_rmse.append(np.mean(test_rmses))
+        mean_test_mae.append(np.mean(test_maes))
+        
+        # Find best trial (lowest RMSE)
         for trial in trials:
-            if trial["test_metrics"]["r2"] > best_r2:
-                best_r2 = trial["test_metrics"]["r2"]
+            if trial["test_metrics"]["rmse"] < best_rmse:
+                best_rmse = trial["test_metrics"]["rmse"]
                 best_split = split_name
                 best_trial = trial
+    
+    # Performance by Split
+    report_lines.append("\n" + "-" * 50)
+    report_lines.append("PERFORMANCE BY SPLIT (averaged over 3 trials)")
+    report_lines.append("-" * 50)
+    report_lines.append(f"\n{'Split':<10} {'CV Train':<12} {'CV Val':<12} {'Test R2':<12} {'Test RMSE':<12} {'Test MAE':<12}")
+    report_lines.append("-" * 70)
+    
+    for i, split_name in enumerate(split_names):
+        report_lines.append(
+            f"{split_name:<10} "
+            f"{mean_train[i]:<12.4f} "
+            f"{mean_val[i]:<12.4f} "
+            f"{mean_test_r2[i]:<12.4f} "
+            f"{mean_test_rmse[i]:<12.4f} "
+            f"{mean_test_mae[i]:<12.4f}"
+        )
     
     # Best Model Details
     if best_trial:
         report_lines.append("\n" + "-" * 50)
-        report_lines.append("BEST MODEL (highest R2)")
+        report_lines.append("BEST MODEL (lowest RMSE)")
         report_lines.append("-" * 50)
         report_lines.append(f"Split: {best_split}")
         report_lines.append(f"Trial: {best_trial['trial'] + 1}")
@@ -172,30 +175,31 @@ def _plot_residuals(best_trial, model_name, output_dir):
 
 def _plot_r2_by_split(results, model_name, output_dir):
     """Plot R2 scores across splits."""
-    splits = list(results.keys())
-    r2_means = []
-    r2_stds = []
+    split_names = []
+    mean_test_r2 = []
+    std_test_r2 = []
     
-    for split_name in splits:
-        avg = _compute_split_averages(results[split_name])
-        r2_means.append(avg["test_r2"][0])
-        r2_stds.append(avg["test_r2"][1])
+    for split_name, trials in results.items():
+        split_names.append(split_name)
+        test_r2s = [t["test_metrics"]["r2"] for t in trials]
+        mean_test_r2.append(np.mean(test_r2s))
+        std_test_r2.append(np.std(test_r2s))
     
     fig, ax = plt.subplots(figsize=(8, 5))
     
-    x = np.arange(len(splits))
-    bars = ax.bar(x, r2_means, yerr=r2_stds, capsize=5, color='steelblue', alpha=0.8)
+    x = np.arange(len(split_names))
+    bars = ax.bar(x, mean_test_r2, yerr=std_test_r2, capsize=5, color='steelblue', alpha=0.8)
     
     ax.set_xlabel('Train/Test Split', fontsize=12)
     ax.set_ylabel('R² Score', fontsize=12)
     ax.set_title(f'{model_name}: R² by Split (± std over 3 trials)', fontsize=14)
     ax.set_xticks(x)
-    ax.set_xticklabels(splits)
+    ax.set_xticklabels(split_names)
     ax.set_ylim(0, 1)
     ax.grid(True, axis='y', alpha=0.3)
     
     # Add value labels
-    for bar, mean in zip(bars, r2_means):
+    for bar, mean in zip(bars, mean_test_r2):
         ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.02, 
                 f'{mean:.3f}', ha='center', va='bottom', fontsize=11)
     
@@ -373,9 +377,9 @@ def plot_parkinsons_model_comparison(all_results, output_dir):
         r2_means = []
         r2_stds = []
         for split in splits:
-            avg = _compute_split_averages(all_results[model][split])
-            r2_means.append(avg["test_r2"][0])
-            r2_stds.append(avg["test_r2"][1])
+            test_r2s = [t["test_metrics"]["r2"] for t in all_results[model][split]]
+            r2_means.append(np.mean(test_r2s))
+            r2_stds.append(np.std(test_r2s))
         
         offset = (i - 1.5) * width  # Center 4 bars
         bars = ax.bar(x + offset, r2_means, width, yerr=r2_stds, capsize=3,
@@ -403,9 +407,9 @@ def plot_parkinsons_model_comparison(all_results, output_dir):
         rmse_means = []
         rmse_stds = []
         for split in splits:
-            avg = _compute_split_averages(all_results[model][split])
-            rmse_means.append(avg["test_rmse"][0])
-            rmse_stds.append(avg["test_rmse"][1])
+            test_rmses = [t["test_metrics"]["rmse"] for t in all_results[model][split]]
+            rmse_means.append(np.mean(test_rmses))
+            rmse_stds.append(np.std(test_rmses))
         
         offset = (i - 1.5) * width  # Center 4 bars
         ax.bar(x + offset, rmse_means, width, yerr=rmse_stds, capsize=3,
@@ -432,7 +436,7 @@ def plot_parkinsons_model_comparison(all_results, output_dir):
     report_lines.append("=" * 80)
     
     report_lines.append("\n" + "-" * 60)
-    report_lines.append("AVERAGE TEST R2 BY MODEL AND SPLIT")
+    report_lines.append("AVERAGE TEST RMSE BY MODEL AND SPLIT")
     report_lines.append("-" * 60)
     
     header = f"{'Model':<20}"
@@ -444,13 +448,13 @@ def plot_parkinsons_model_comparison(all_results, output_dir):
     
     for model in model_names:
         row = f"{model:<20}"
-        all_r2 = []
+        all_rmse = []
         for split in splits:
-            avg = _compute_split_averages(all_results[model][split])
-            r2 = avg["test_r2"][0]
-            all_r2.append(r2)
-            row += f"{r2:.4f}         "
-        row += f"{np.mean(all_r2):.4f}"
+            test_rmses = [t["test_metrics"]["rmse"] for t in all_results[model][split]]
+            rmse = np.mean(test_rmses)
+            all_rmse.append(rmse)
+            row += f"{rmse:.4f}         "
+        row += f"{np.mean(all_rmse):.4f}"
         report_lines.append(row)
     
     # Best model
@@ -459,13 +463,13 @@ def plot_parkinsons_model_comparison(all_results, output_dir):
     report_lines.append("-" * 60)
     
     best_model = None
-    best_r2 = -float('inf')
+    best_rmse = float('inf')
     
     for model in model_names:
         for split in splits:
             for trial in all_results[model][split]:
-                if trial["test_metrics"]["r2"] > best_r2:
-                    best_r2 = trial["test_metrics"]["r2"]
+                if trial["test_metrics"]["rmse"] < best_rmse:
+                    best_rmse = trial["test_metrics"]["rmse"]
                     best_model = model
                     best_split = split
                     best_trial_info = trial
@@ -473,9 +477,9 @@ def plot_parkinsons_model_comparison(all_results, output_dir):
     if best_model:
         report_lines.append(f"Model: {best_model}")
         report_lines.append(f"Split: {best_split}")
-        report_lines.append(f"R2:    {best_r2:.4f}")
-        report_lines.append(f"RMSE:  {best_trial_info['test_metrics']['rmse']:.4f} degC")
-        report_lines.append(f"MAE:   {best_trial_info['test_metrics']['mae']:.4f} degC")
+        report_lines.append(f"RMSE:  {best_rmse:.4f}")
+        report_lines.append(f"R2:    {best_trial_info['test_metrics']['r2']:.4f}")
+        report_lines.append(f"MAE:   {best_trial_info['test_metrics']['mae']:.4f}")
     
     # Save comparison report
     report_path = os.path.join(output_dir, "model_comparison_report.txt")
