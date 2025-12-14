@@ -68,20 +68,11 @@ def generate_boosting(train_df, test_df, random_state, predictors, target_col):
 
 def generate_random_forest(train_df, test_df, random_state, predictors, target_col):
     """Random Forest classification with modest grid for Thyroid dataset."""
-    # param_grid = {
-    #     "model__n_estimators": [100, 200],
-    #     "model__max_depth": [1, 2, 3, None],
-    #     "model__min_samples_split": [1, 2, 3],
-    #     "model__min_samples_leaf": [1, 2, 3],
-    #     "model__max_features": ["sqrt"],
-    # }
-    
-    # Fixed params from best model (Split: 50_50, Trial: 0)
     param_grid = {
-        "model__n_estimators": [200],
-        "model__max_depth": [None],
-        "model__min_samples_split": [3],
-        "model__min_samples_leaf": [1],
+        "model__n_estimators": [100, 200],
+        "model__max_depth": [1, 2, 3, None],
+        "model__min_samples_split": [1, 2, 3],
+        "model__min_samples_leaf": [1, 2, 3],
         "model__max_features": ["sqrt"],
     }
 
@@ -99,28 +90,16 @@ def generate_random_forest(train_df, test_df, random_state, predictors, target_c
 
 def generate_neural_network(train_df, test_df, random_state, predictors, target_col):
     """Neural Network (MLP) classification for Thyroid Cancer recurrence."""
-    # hidden_layer_sizes_grid = [
-    #     (16,),
-    #     (32,),
-    #     (16, 8),
-    # ]
-
-    # Fixed architecture from best model (Split: 50_50, Trial: 0)
     hidden_layer_sizes_grid = [
+        (16,),
+        (32,),
         (16, 8),
     ]
 
-    # param_grid = {
-    #     "model__learning_rate_init": [0.001, 0.01],
-    #     "model__alpha": [0.0001, 0.001],
-    #     "model__batch_size": [16, 32],
-    # }
-    
-    # Fixed params from best model (Split: 50_50, Trial: 0)
     param_grid = {
-        "model__learning_rate_init": [0.01],
-        "model__alpha": [0.001],
-        "model__batch_size": [16],
+        "model__learning_rate_init": [0.001, 0.01],
+        "model__alpha": [0.0001, 0.001],
+        "model__batch_size": [16, 32],
     }
 
     return run_neural_net_experiment(

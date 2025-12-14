@@ -40,25 +40,14 @@ def generate_boosting(train_df, test_df, RANDOM_STATE):
     predictors = [c for c in train_df.columns if c != target_col]
     
     # XGBoost hyperparameters (compatible with old grid + new XGBoost features)
-    # param_grid = {
-    #     "model__n_estimators": [100, 200, 300],
-    #     "model__learning_rate": [0.01, 0.05, 0.1],
-    #     "model__max_depth": [3, 5, 7],
-    #     "model__subsample": [0.8, 1.0],
-    #     "model__scale_pos_weight": [1, 3, 5],  # For imbalanced classes (helps recall!)
-    #     "model__reg_alpha": [0, 0.1],          # L1 regularization
-    #     "model__reg_lambda": [1, 10],          # L2 regularization
-    # }
-    
-    # Fixed params from best model (Split: 80_20, Trial: 0)
     param_grid = {
-        "model__n_estimators": [100],
-        "model__learning_rate": [0.01],
-        "model__max_depth": [7],
-        "model__subsample": [0.8],
-        "model__scale_pos_weight": [5],
-        "model__reg_alpha": [0],
-        "model__reg_lambda": [10],
+        "model__n_estimators": [100, 200, 300],
+        "model__learning_rate": [0.01, 0.05, 0.1],
+        "model__max_depth": [3, 5, 7],
+        "model__subsample": [0.8, 1.0],
+        "model__scale_pos_weight": [1, 3, 5],  # For imbalanced classes (helps recall!)
+        "model__reg_alpha": [0, 0.1],          # L1 regularization
+        "model__reg_lambda": [1, 10],          # L2 regularization
     }
 
     results = run_boosting_experiment(
@@ -80,21 +69,12 @@ def generate_random_forest(train_df, test_df, RANDOM_STATE):
     
     # Reduced grid for efficiency (72 combos vs 288)
     # Random Forest is robust; fewer hyperparams often sufficient
-    # param_grid = {
-    #     "model__n_estimators": [200, 300, 500, 800],    # fewer trees still effective
-    #     "model__max_depth": [8, 10, 12, 16, None],         # 3 depths
-    #     "model__min_samples_split": [2, 3, 5, 10],         # 2 values
-    #     "model__min_samples_leaf": [2, 4, 6, 8],          # 2 values
-    #     "model__max_features": ['sqrt'],    # 2 feature selection methods
-    # }
-
-    # Fixed params from best model (Split: 80_20, Trial: 0)
     param_grid = {
-        "model__n_estimators": [300],
-        "model__max_depth": [16],
-        "model__min_samples_split": [10],
-        "model__min_samples_leaf": [2],
-        "model__max_features": ['sqrt'],
+        "model__n_estimators": [200, 300, 500, 800],    # fewer trees still effective
+        "model__max_depth": [8, 10, 12, 16, None],         # 3 depths
+        "model__min_samples_split": [2, 3, 5, 10],         # 2 values
+        "model__min_samples_leaf": [2, 4, 6, 8],          # 2 values
+        "model__max_features": ['sqrt'],    # 2 feature selection methods
     }
 
 
@@ -116,32 +96,20 @@ def generate_neural_network(train_df, test_df, RANDOM_STATE):
     predictors = [c for c in train_df.columns if c != target_col]
 
     # Network architectures to try
-    # hidden_layer_sizes_grid = [
-    #         (64,),            # Simpler
-    #         (100,),
-    #         (50, 50),         # Your idea ✓
-    #         (64, 32),         # Pyramid shape
-    #         (100, 50),        # Gradual reduction
-    # ]
-    
-    # Fixed architecture from best model (Split: 80_20, Trial: 0)
     hidden_layer_sizes_grid = [
-        (100, 50),
+            (64,),            # Simpler
+            (100,),
+            (50, 50),         # Your idea ✓
+            (64, 32),         # Pyramid shape
+            (100, 50),        # Gradual reduction
     ]
     
     # Other hyperparameters (reduced for efficiency)
     # Full grid: 3 * 3 * 3 * 3 = 81 combos
-    # param_grid = {
-    #     "model__learning_rate_init": [0.001, 0.01, 0.03],
-    #     "model__alpha": [0.0001, 0.001, 0.01],
-    #     "model__batch_size": [32, 64, 'auto'],
-    # }
-    
-    # Fixed params from best model (Split: 80_20, Trial: 0)
     param_grid = {
-        "model__learning_rate_init": [0.001],
-        "model__alpha": [0.01],
-        "model__batch_size": [32],
+        "model__learning_rate_init": [0.001, 0.01, 0.03],
+        "model__alpha": [0.0001, 0.001, 0.01],
+        "model__batch_size": [32, 64, 'auto'],
     }
 
     results = run_neural_net_experiment(
