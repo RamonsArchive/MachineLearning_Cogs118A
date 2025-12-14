@@ -11,30 +11,26 @@ def main():
     print("=" * 80)
     bank_main()
 
-    print("\n" + "=" * 80)
-    print("RUNNING FACE TEMPERATURE EXPERIMENTS")
-    print("=" * 80)
-    face_temp_main()
-
-    # print("\n" + "=" * 80)
-    # print("RUNNING PARKINSON'S TELEMONITORING EXPERIMENTS")
-    # print("=" * 80)
-    # parkinsons_main()
-
     # print("\n" + "=" * 80)
     # print("RUNNING FACE TEMPERATURE EXPERIMENTS")
     # print("=" * 80)
     # face_temp_main()
 
     # print("\n" + "=" * 80)
-    # print("RUNNING THYROID CANCER EXPERIMENTS")
+    # print("RUNNING PARKINSON'S TELEMONITORING EXPERIMENTS")
     # print("=" * 80)
-    # thyroid_cancer_main()
+    # parkinsons_main()
 
-    # print("\n" + "=" * 80)
-    # print("RUNNING WINE QUALITY EXPERIMENTS")
-    # print("=" * 80)
-    # wine_main()
+
+    print("\n" + "=" * 80)
+    print("RUNNING THYROID CANCER EXPERIMENTS")
+    print("=" * 80)
+    thyroid_cancer_main()
+
+    print("\n" + "=" * 80)
+    print("RUNNING WINE QUALITY EXPERIMENTS")
+    print("=" * 80)
+    wine_main()
 
 
 if __name__ == "__main__":

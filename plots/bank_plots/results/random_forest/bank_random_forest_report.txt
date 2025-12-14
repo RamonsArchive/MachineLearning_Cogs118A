@@ -10,23 +10,23 @@ Scoring Metric: ROC-AUC
 
 PERFORMANCE BY SPLIT (averaged over 3 trials)
 ----------------------------------------------------------------------
-Split        Train (CV)      Val (CV)        Test           
+Split        CV Train     CV Val       Test Acc     Test F1      Test ROC-AUC
 ----------------------------------------------------------------------
-20_80        0.6329          0.4956          0.7852         
-50_50        0.5952          0.4980          0.7906         
-80_20        0.5890          0.4985          0.7966         
+20_80        0.6622       0.4941       0.8735       0.4917       0.7850      
+50_50        0.6079       0.4951       0.8717       0.5002       0.7933      
+80_20        0.5852       0.4968       0.8706       0.5072       0.7974      
 
 OVERFITTING ANALYSIS
 ----------------------------------------------------------------------
 Split 20_80:
-  Train-Val gap: +0.1372 (>0.05 suggests overfitting)
-  Val-Test gap:  -0.2895 (large gap = CV overestimates performance)
+  Train-Val gap: +0.1681 (>0.05 suggests overfitting)
+  Val-Test gap:  -0.2908 (large gap = CV overestimates performance)
 Split 50_50:
-  Train-Val gap: +0.0972 (>0.05 suggests overfitting)
-  Val-Test gap:  -0.2927 (large gap = CV overestimates performance)
+  Train-Val gap: +0.1129 (>0.05 suggests overfitting)
+  Val-Test gap:  -0.2982 (large gap = CV overestimates performance)
 Split 80_20:
-  Train-Val gap: +0.0905 (>0.05 suggests overfitting)
-  Val-Test gap:  -0.2981 (large gap = CV overestimates performance)
+  Train-Val gap: +0.0884 (>0.05 suggests overfitting)
+  Val-Test gap:  -0.3006 (large gap = CV overestimates performance)
 
 BEST MODEL (by test ROC-AUC)
 ----------------------------------------------------------------------

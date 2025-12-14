@@ -2,21 +2,21 @@ Wine Dataset – Model Comparison Report
 ======================================================================
 
 Split 20_80:
-  boosting: mean=0.9487, std=0.0257
-  random_forest: mean=0.9674, std=0.0066
+  boosting: mean=0.9557, std=0.0201
+  random_forest: mean=0.9720, std=0.0114
   neural_network: mean=0.8019, std=0.1150
 
 Split 50_50:
-  boosting: mean=0.9700, std=0.0053
-  random_forest: mean=0.9738, std=0.0053
-  neural_network: mean=0.9213, std=0.0318
+  boosting: mean=0.9663, std=0.0092
+  random_forest: mean=0.9700, std=0.0053
+  neural_network: mean=0.9438, std=0.0367
 
 Split 80_20:
-  boosting: mean=0.9907, std=0.0131
+  boosting: mean=1.0000, std=0.0000
   random_forest: mean=0.9907, std=0.0131
-  neural_network: mean=0.9630, std=0.0262
+  neural_network: mean=0.9722, std=0.0227
 
 Best overall model by mean test accuracy:
 ----------------------------------------------------------------------
   Model: random_forest
-  Mean accuracy: 0.9773
+  Mean accuracy: 0.9776

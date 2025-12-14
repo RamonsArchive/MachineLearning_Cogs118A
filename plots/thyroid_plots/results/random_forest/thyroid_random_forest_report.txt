@@ -3,9 +3,11 @@ Thyroid Cancer Dataset – Random Forest Summary Report
 
 PERFORMANCE BY SPLIT (averaged over 3 trials)
 ----------------------------------------------------------------------
-20_80      Train (CV) = 0.9424, Val (CV) = 0.8793, Test Acc = 0.9229
-50_50      Train (CV) = 0.9954, Val (CV) = 0.9004, Test Acc = 0.9670
-80_20      Train (CV) = 0.9937, Val (CV) = 0.9369, Test Acc = 0.9610
+Split      CV Train     CV Val       Test Acc     Test F1      Test ROC-AUC
+----------------------------------------------------------------------
+20_80      1.0000       0.8291       0.9316       0.8773       0.9788      
+50_50      1.0000       0.8950       0.9653       0.9359       0.9898      
+80_20      1.0000       0.9366       0.9654       0.9353       0.9865      
 
 Best model (by ROC-AUC):
 ----------------------------------------------------------------------

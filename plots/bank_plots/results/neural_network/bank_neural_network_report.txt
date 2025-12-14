@@ -11,23 +11,23 @@ Activation: ReLU | Solver: Adam | Early Stopping: Yes
 
 PERFORMANCE BY SPLIT (averaged over 3 trials)
 ----------------------------------------------------------------------
-Split        Train (CV)      Val (CV)        Test           
+Split        CV Train     CV Val       Test Acc     Test F1      Test ROC-AUC
 ----------------------------------------------------------------------
-20_80        0.4059          0.3826          0.7804         
-50_50        0.4105          0.3755          0.7838         
-80_20        0.4039          0.3768          0.7907         
+20_80        0.3897       0.3304       0.8985       0.3471       0.7846      
+50_50        0.4134       0.3534       0.8998       0.3602       0.7873      
+80_20        0.3807       0.3560       0.9011       0.3512       0.7915      
 
 OVERFITTING ANALYSIS
 ----------------------------------------------------------------------
 Split 20_80:
-  Train-Val gap: +0.0233 (>0.05 suggests overfitting)
-  Val-Test gap:  -0.3978
+  Train-Val gap: +0.0593 (>0.05 suggests overfitting)
+  Val-Test gap:  -0.4542
 Split 50_50:
-  Train-Val gap: +0.0350 (>0.05 suggests overfitting)
-  Val-Test gap:  -0.4083
+  Train-Val gap: +0.0600 (>0.05 suggests overfitting)
+  Val-Test gap:  -0.4339
 Split 80_20:
-  Train-Val gap: +0.0271 (>0.05 suggests overfitting)
-  Val-Test gap:  -0.4139
+  Train-Val gap: +0.0247 (>0.05 suggests overfitting)
+  Val-Test gap:  -0.4355
 
 BEST MODEL (by test ROC-AUC)
 ----------------------------------------------------------------------

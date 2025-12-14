@@ -3,9 +3,11 @@ Wine Dataset – Neural Network (MLP) Summary Report
 
 PERFORMANCE BY SPLIT (averaged over 3 trials)
 ----------------------------------------------------------------------
-20_80      Train (CV) = 0.9195, Val (CV) = 0.8541, Test Acc = 0.8019
-50_50      Train (CV) = 0.9585, Val (CV) = 0.9328, Test Acc = 0.9213
-80_20      Train (CV) = 0.9639, Val (CV) = 0.9468, Test Acc = 0.9630
+Split      CV Train     CV Val       Test Acc     Test F1      Test ROC-AUC
+----------------------------------------------------------------------
+20_80      0.9195       0.8541       0.8019       0.7964       0.9195      
+50_50      0.9604       0.9284       0.9438       0.9436       0.9899      
+80_20      0.9764       0.9449       0.9722       0.9723       1.0000      
 
 Best model (by test accuracy):
 ----------------------------------------------------------------------

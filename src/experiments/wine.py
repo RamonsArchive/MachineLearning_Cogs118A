@@ -36,13 +36,23 @@ def generate_boosting(train_df, test_df, random_state, predictors, target_col):
     Use a SMALLER grid than bank because the dataset is tiny (178 rows).
     """
 
+    # param_grid = {
+    #     "model__n_estimators": [50, 100],
+    #     "model__learning_rate": [0.05, 0.1],
+    #     "model__max_depth": [2, 3],
+    #     "model__subsample": [0.8, 1.0],
+    #     "model__reg_alpha": [0, 0.1],
+    #     "model__reg_lambda": [1, 10],
+    # }
+    
+    # Fixed params from best model (Split: 80_20, Trial: 0)
     param_grid = {
-        "model__n_estimators": [50, 100],
-        "model__learning_rate": [0.05, 0.1],
-        "model__max_depth": [2, 3],
-        "model__subsample": [0.8, 1.0],
-        "model__reg_alpha": [0, 0.1],
-        "model__reg_lambda": [1, 10],
+        "model__n_estimators": [100],
+        "model__learning_rate": [0.1],
+        "model__max_depth": [3],
+        "model__subsample": [0.8],
+        "model__reg_alpha": [0],
+        "model__reg_lambda": [10],
     }
 
     results = run_boosting_experiment(
@@ -62,11 +72,20 @@ def generate_boosting(train_df, test_df, random_state, predictors, target_col):
 def generate_random_forest(train_df, test_df, random_state, predictors, target_col):
     """Random Forest classification with a compact grid for the small Wine dataset."""
 
+    # param_grid = {
+    #     "model__n_estimators": [100, 200],
+    #     "model__max_depth": [3, 5, None],
+    #     "model__min_samples_split": [2, 4],
+    #     "model__min_samples_leaf": [1, 2],
+    #     "model__max_features": ["sqrt"],
+    # }
+    
+    # Fixed params from best model (Split: 80_20, Trial: 0)
     param_grid = {
-        "model__n_estimators": [100, 200],
-        "model__max_depth": [3, 5, None],
-        "model__min_samples_split": [2, 4],
-        "model__min_samples_leaf": [1, 2],
+        "model__n_estimators": [100],
+        "model__max_depth": [3],
+        "model__min_samples_split": [2],
+        "model__min_samples_leaf": [1],
         "model__max_features": ["sqrt"],
     }
 
@@ -91,16 +110,28 @@ def generate_neural_network(train_df, test_df, random_state, predictors, target_
     """
 
 
+    # hidden_layer_sizes_grid = [
+    #     (16,),
+    #     (32,),
+    #     (16, 8),
+    # ]
+
+    # Fixed architecture from best model (Split: 80_20, Trial: 2)
     hidden_layer_sizes_grid = [
-        (16,),
         (32,),
-        (16, 8),
     ]
 
+    # param_grid = {
+    #     "model__learning_rate_init": [0.001, 0.01],
+    #     "model__alpha": [0.0001, 0.001],
+    #     "model__batch_size": [16, 32],
+    # }
+    
+    # Fixed params from best model (Split: 80_20, Trial: 2)
     param_grid = {
-        "model__learning_rate_init": [0.001, 0.01],
-        "model__alpha": [0.0001, 0.001],
-        "model__batch_size": [16, 32],
+        "model__learning_rate_init": [0.01],
+        "model__alpha": [0.0001],
+        "model__batch_size": [16],
     }
 
     results = run_neural_net_experiment(

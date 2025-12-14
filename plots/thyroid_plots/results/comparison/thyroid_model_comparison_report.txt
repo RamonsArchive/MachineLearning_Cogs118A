@@ -2,21 +2,21 @@ Thyroid Cancer Dataset – Model Comparison Report
 ======================================================================
 
 Split 20_80:
-  boosting: mean=0.9835, std=0.0015
-  random_forest: mean=0.9776, std=0.0096
-  neural_network: mean=0.9634, std=0.0066
+  boosting: mean=0.9835, std=0.0042
+  random_forest: mean=0.9788, std=0.0105
+  neural_network: mean=0.9500, std=0.0069
 
 Split 50_50:
-  boosting: mean=0.9917, std=0.0036
-  random_forest: mean=0.9889, std=0.0062
+  boosting: mean=0.9883, std=0.0037
+  random_forest: mean=0.9898, std=0.0056
   neural_network: mean=0.9842, std=0.0053
 
 Split 80_20:
-  boosting: mean=0.9906, std=0.0066
-  random_forest: mean=0.9857, std=0.0133
-  neural_network: mean=0.9774, std=0.0098
+  boosting: mean=0.9915, std=0.0044
+  random_forest: mean=0.9865, std=0.0121
+  neural_network: mean=0.9793, std=0.0038
 
 Best overall model by mean ROC-AUC (fallback accuracy):
 ----------------------------------------------------------------------
   Model: boosting
-  Mean score: 0.9886
+  Mean score: 0.9877

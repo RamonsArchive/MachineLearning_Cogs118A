@@ -3,9 +3,11 @@ Thyroid Cancer Dataset – XGBoost (Boosting) Summary Report
 
 PERFORMANCE BY SPLIT (averaged over 3 trials)
 ----------------------------------------------------------------------
-20_80      Train (CV) = 0.9293, Val (CV) = 0.9008, Test Acc = 0.9446
-50_50      Train (CV) = 0.9438, Val (CV) = 0.9162, Test Acc = 0.9705
-80_20      Train (CV) = 0.9686, Val (CV) = 0.9462, Test Acc = 0.9524
+Split      CV Train     CV Val       Test Acc     Test F1      Test ROC-AUC
+----------------------------------------------------------------------
+20_80      0.9473       0.8251       0.9479       0.9055       0.9835      
+50_50      0.9629       0.8891       0.9618       0.9305       0.9883      
+80_20      0.9615       0.9374       0.9610       0.9291       0.9915      
 
 Best model (by ROC-AUC):
 ----------------------------------------------------------------------

@@ -3,9 +3,11 @@ Wine Dataset – Random Forest Summary Report
 
 PERFORMANCE BY SPLIT (averaged over 3 trials)
 ----------------------------------------------------------------------
-20_80      Train (CV) = 1.0000, Val (CV) = 0.9329, Test Acc = 0.9674
-50_50      Train (CV) = 1.0000, Val (CV) = 0.9851, Test Acc = 0.9738
-80_20      Train (CV) = 1.0000, Val (CV) = 0.9800, Test Acc = 0.9907
+Split      CV Train     CV Val       Test Acc     Test F1      Test ROC-AUC
+----------------------------------------------------------------------
+20_80      1.0000       0.9211       0.9720       0.9718       0.9992      
+50_50      1.0000       0.9776       0.9700       0.9699       0.9975      
+80_20      0.9995       0.9775       0.9907       0.9908       1.0000      
 
 Best model (by test accuracy):
 ----------------------------------------------------------------------

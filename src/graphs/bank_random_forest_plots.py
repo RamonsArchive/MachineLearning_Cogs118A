@@ -213,7 +213,7 @@ def plot_bank_random_forest_summary(results_rf, save_dir):
         f.write("-" * 70 + "\n")
         for i, split_name in enumerate(split_names):
             overfit_gap = mean_train[i] - mean_val[i]
-            generalization_gap = mean_val[i] - mean_test[i]
+            generalization_gap = mean_val[i] - mean_test_roc_auc[i]
             f.write(f"Split {split_name}:\n")
             f.write(f"  Train-Val gap: {overfit_gap:+.4f} (>0.05 suggests overfitting)\n")
             f.write(f"  Val-Test gap:  {generalization_gap:+.4f} (large gap = CV overestimates performance)\n")

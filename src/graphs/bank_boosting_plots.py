@@ -34,15 +34,12 @@ def plot_bank_boosting_summary(results_boosting, save_dir):
     split_names = []
     mean_train = []
     mean_val = []
-    mean_test = []
-
-    # Also keep overall-best model for ROC/confusion matrix
-    best_model = None  # dict: {"split_name": ..., "trial_index": ..., "record": ...}
-
-    # Also collect averages for accuracy, F1, ROC-AUC
     mean_test_acc = []
     mean_test_f1 = []
     mean_test_roc_auc = []
+
+    # Also keep overall-best model for ROC/confusion matrix
+    best_model = None  # dict: {"split_name": ..., "trial_index": ..., "record": ...}
 
     for split_name, trials in results_boosting.items():
         split_names.append(split_name)
@@ -55,7 +52,6 @@ def plot_bank_boosting_summary(results_boosting, save_dir):
 
         mean_train.append(np.mean(train_scores))
         mean_val.append(np.mean(val_scores))
-        mean_test.append(np.mean(test_roc_aucs))
         mean_test_acc.append(np.mean(test_accs))
         mean_test_f1.append(np.mean(test_f1s))
         mean_test_roc_auc.append(np.mean(test_roc_aucs))
@@ -75,7 +71,7 @@ def plot_bank_boosting_summary(results_boosting, save_dir):
     plt.figure()
     plt.plot(split_names, mean_train, marker="o", label="Train (CV mean)")
     plt.plot(split_names, mean_val, marker="o", label="Validation (CV mean)")
-    plt.plot(split_names, mean_test, marker="o", label="Test (mean of trials)")
+    plt.plot(split_names, mean_test_roc_auc, marker="o", label="Test (mean of trials)")
     plt.xlabel("Train/Test split")
     plt.ylabel("ROC-AUC")
     plt.title("Bank Dataset – Boosting ROC-AUC vs split")

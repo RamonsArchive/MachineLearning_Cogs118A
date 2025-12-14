@@ -1,10 +1,13 @@
 Bank Dataset – Boosting Summary Report
 ======================================
 
-Mean ROC-AUC by split (averaged over 3 trials):
-  Split 20_80: Train (CV) = 0.5348, Val (CV) = 0.4995, Test = 0.7909
-  Split 50_50: Train (CV) = 0.5316, Val (CV) = 0.5031, Test = 0.7964
-  Split 80_20: Train (CV) = 0.5245, Val (CV) = 0.5036, Test = 0.8045
+PERFORMANCE BY SPLIT (averaged over 3 trials)
+----------------------------------------------------------------------
+Split      CV Train     CV Val       Test Acc     Test F1      Test ROC-AUC
+----------------------------------------------------------------------
+20_80      0.5488       0.4893       0.8771       0.4914       0.7886      
+50_50      0.5320       0.4979       0.8770       0.5048       0.7965      
+80_20      0.5238       0.5018       0.8787       0.5163       0.8032      
 
 (Train vs Val/Test gives a sense of overfitting.
  If Train >> Val/Test, model is likely overfitting.)
