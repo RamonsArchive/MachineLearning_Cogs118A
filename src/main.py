@@ -7,9 +7,16 @@ from experiments.rescue import main as rescue_main
 from experiments.rescue_classification import main as rescue_classification_main
 from experiments.rescue_inferential import main as rescue_inferential_main
 from experiments.piano import main as piano_main
+from experiments.forecast_demand import main as forecast_demand_main
 
 
 def main():
+    print("\n" + "=" * 80)
+    print("RUNNING FORECAST DEMAND EXPERIMENT 1 (REGRESSION)")
+    print("=" * 80)
+    forecast_demand_main()
+    return  # Experiment 1 only; the rescue blocks below are the prior harness default.
+
     # print("\n" + "=" * 80)
     # print("RUNNING BANK MARKETING EXPERIMENTS")
     # print("=" * 80)

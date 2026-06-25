@@ -1,0 +1,48 @@
+==============================================================================
+MODALAI DEMAND FORECAST - RANDOM FOREST RESULTS
+==============================================================================
+Target: demand_qty (winsorized + log1p; metrics inverted to real units)
+Primary metric: RMSE (units, lower is better). Temporal split; 3 split(s) x 3 trial(s)  [full run].
+
+----------------------------------------------------------------------
+PERFORMANCE BY SPLIT  (mean +/- std over 3 trial(s))
+----------------------------------------------------------------------
+Split   Test RMSE           Test MAE          MAE!=0            Test R2         
+----------------------------------------------------------------------
+20_80     87.084 +/- 0.082   13.084 +/- 0.009   89.00 +/- 0.09   0.032 +/- 0.002
+50_50    110.381 +/- 0.094   16.974 +/- 0.019  117.63 +/- 0.14   0.025 +/- 0.002
+80_20    209.376 +/- 0.030   31.276 +/- 0.042  187.47 +/- 0.04   0.024 +/- 0.000
+
+----------------------------------------------------------------------
+CV (on log target, neg_MSE) + OVERFITTING CHECK  (mean over trials)
+----------------------------------------------------------------------
+Split   CV train      CV val        Train RMSE    Test RMSE     
+----------------------------------------------------------------------
+20_80   -0.3345       -0.7312       50.683        87.084        
+50_50   -0.3855       -0.7722       53.973        110.381       
+80_20   -0.1405       -0.8169       94.590        209.376       
+
+----------------------------------------------------------------------
+BEST MODEL (lowest test RMSE)
+----------------------------------------------------------------------
+Split: 20_80   Trial: 2
+
+Best hyperparameters:
+  model__max_depth: 20
+  model__max_features: sqrt
+  model__min_samples_leaf: 1
+  model__n_estimators: 200
+
+Test metrics (real units):
+  RMSE:        86.9694
+  MAE:         13.0712
+  MAE (!=0):   88.8727
+  R2:          0.0348
+  MSE:         7563.6748
+
+----------------------------------------------------------------------
+INTERPRETATION
+----------------------------------------------------------------------
+Model quality: POOR (best test R2 = 0.0348)
+Explains 3.5% of variance in weekly demand on held-out weeks.
+Typical error on weeks that DO have demand: MAE!=0 ~ 88.87 units.

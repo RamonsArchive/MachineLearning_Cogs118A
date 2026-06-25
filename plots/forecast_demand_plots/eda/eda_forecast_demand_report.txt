@@ -1,0 +1,48 @@
+======================================================================
+MODALAI PART/COMPONENT DEMAND - EXPLORATORY DATA ANALYSIS
+======================================================================
+
+Task: REGRESSION (predict weekly demand_qty per part)
+Target: demand_qty = max(sh_outflow_qty, build_consumed_qty)
+
+--------------------------------------------------
+DATASET OVERVIEW
+--------------------------------------------------
+Part-weeks (rows):     52461
+Distinct weeks:        29
+Week range:            2025-12-08 -> 2026-06-22
+
+--------------------------------------------------
+TARGET DISTRIBUTION (demand_qty) - zero-inflated & heavy-tailed
+--------------------------------------------------
+Zero part-weeks:       86.49% (intermittent demand)
+Mean (all):            22.9310
+Std  (all):            475.5576
+Max  (all):            61590.0   <- recount/correction spikes
+P50.0  (all):         0.0000
+P90.0  (all):         4.0000
+P99.0  (all):         309.4000
+P99.9  (all):         3939.8600
+
+Among NON-ZERO part-weeks (n=7086):
+  Mean: 169.7687  Median: 13.0000  Max: 61590.0
+
+--------------------------------------------------
+NAIVE BASELINE FLOOR (raw target)
+--------------------------------------------------
+Mean predictor (always predict global mean):
+  RMSE: 475.5531
+  MAE:  42.2884
+  R2:   0.0000 (by definition)
+
+Note: the experiment ALSO reports last-value, 4-week moving-average,
+and Croston baselines on the held-out weeks (a fairer intermittent floor
+than the global mean), and evaluates models against them.
+
+--------------------------------------------------
+MODELING NOTES (applied in the experiment)
+--------------------------------------------------
+- Winsorize target upper tail (recount spikes) + log1p; invert for metrics.
+- Temporal split (test weeks strictly later than train) - NOT shuffled.
+- XGB keeps NaN natively; RF/NN median-impute + missingness indicator.
+- Static part attributes are CURRENT snapshots (backtesting caveat).
