@@ -8,14 +8,20 @@ from experiments.rescue_classification import main as rescue_classification_main
 from experiments.rescue_inferential import main as rescue_inferential_main
 from experiments.piano import main as piano_main
 from experiments.forecast_demand import main as forecast_demand_main
+from experiments.forecast_sku_sales import main as forecast_sku_sales_main
 
 
 def main():
     print("\n" + "=" * 80)
-    print("RUNNING FORECAST DEMAND EXPERIMENT 1 (REGRESSION)")
+    print("RUNNING FORECAST DEMAND EXPERIMENT 1 (REGRESSION, v2 panel)")
     print("=" * 80)
     forecast_demand_main()
-    return  # Experiment 1 only; the rescue blocks below are the prior harness default.
+
+    print("\n" + "=" * 80)
+    print("RUNNING SHOPIFY SKU-SALES EXPERIMENT 3 (REGRESSION)")
+    print("=" * 80)
+    forecast_sku_sales_main()
+    return  # Experiments 1 & 3; the rescue blocks below are the prior harness default.
 
     # print("\n" + "=" * 80)
     # print("RUNNING BANK MARKETING EXPERIMENTS")

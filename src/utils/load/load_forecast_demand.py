@@ -33,10 +33,12 @@ def load_forecast_demand_data(curr_dir):
     Returns:
         pd.DataFrame: full unified panel (126,630 x 46), unmodified.
     """
+    # v2 panel: Shopify external demand folded into the target (BOM roll-down + direct
+    # part-match) so the series spans the full ~70 weeks, plus new leak-safe predictors.
     data_path = os.path.join(
-        curr_dir, "../../datasets/ForecastDemandSets/part_week_panel.csv"
+        curr_dir, "../../datasets/ForecastDemandSets/part_week_panel_v2.csv"
     )
-    data = pd.read_csv(data_path, parse_dates=["week_start"])
+    data = pd.read_csv(data_path, parse_dates=["week_start"], low_memory=False)
 
     print(
         f"[load_forecast_demand] Loaded {len(data)} part-weeks "

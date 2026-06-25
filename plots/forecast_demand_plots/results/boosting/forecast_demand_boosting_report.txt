@@ -9,41 +9,41 @@ PERFORMANCE BY SPLIT  (mean +/- std over 3 trial(s))
 ----------------------------------------------------------------------
 Split   Test RMSE           Test MAE          MAE!=0            Test R2         
 ----------------------------------------------------------------------
-20_80     88.346 +/- 0.285   13.322 +/- 0.026   90.38 +/- 0.36   0.004 +/- 0.006
-50_50    110.921 +/- 0.565   17.096 +/- 0.093  118.02 +/- 0.71   0.015 +/- 0.010
-80_20    208.660 +/- 0.207   31.607 +/- 0.099  185.70 +/- 0.29   0.031 +/- 0.002
+20_80      0.000 +/- 0.000    0.000 +/- 0.000     nan +/- nan    1.000 +/- 0.000
+50_50     14.386 +/- 0.022    3.599 +/- 0.003   22.80 +/- 0.03  -0.038 +/- 0.003
+80_20     79.099 +/- 0.244   14.552 +/- 0.041   83.73 +/- 0.25   0.022 +/- 0.006
 
 ----------------------------------------------------------------------
 CV (on log target, neg_MSE) + OVERFITTING CHECK  (mean over trials)
 ----------------------------------------------------------------------
 Split   CV train      CV val        Train RMSE    Test RMSE     
 ----------------------------------------------------------------------
-20_80   -0.5211       -0.7378       53.416        88.346        
-50_50   -0.4516       -0.7863       53.106        110.921       
-80_20   -0.3346       -0.8073       98.042        208.660       
+20_80   0.0000        0.0000        0.000         0.000         
+50_50   -0.0250       -0.0364       2.348         14.386        
+80_20   -0.1043       -0.2525       21.916        79.099        
 
 ----------------------------------------------------------------------
 BEST MODEL (lowest test RMSE)
 ----------------------------------------------------------------------
-Split: 20_80   Trial: 2
+Split: 20_80   Trial: 1
 
 Best hyperparameters:
-  model__learning_rate: 0.05
-  model__max_depth: 6
-  model__n_estimators: 100
-  model__reg_lambda: 10.0
+  model__learning_rate: 0.01
+  model__max_depth: 1
+  model__n_estimators: 50
+  model__reg_lambda: 0.01
   model__subsample: 0.5
 
 Test metrics (real units):
-  RMSE:        87.9437
-  MAE:         13.2861
-  MAE (!=0):   89.8699
-  R2:          0.0131
-  MSE:         7734.0952
+  RMSE:        0.0000
+  MAE:         0.0000
+  MAE (!=0):   nan
+  R2:          1.0000
+  MSE:         0.0000
 
 ----------------------------------------------------------------------
 INTERPRETATION
 ----------------------------------------------------------------------
-Model quality: POOR (best test R2 = 0.0131)
-Explains 1.3% of variance in weekly demand on held-out weeks.
-Typical error on weeks that DO have demand: MAE!=0 ~ 89.87 units.
+Model quality: EXCELLENT (best test R2 = 1.0000)
+Explains 100.0% of variance in weekly demand on held-out weeks.
+Typical error on weeks that DO have demand: MAE!=0 ~ nan units.

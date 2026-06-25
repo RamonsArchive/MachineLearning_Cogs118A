@@ -1,0 +1,32 @@
+================================================================================
+MODALAI SHOPIFY SKU SALES - MODEL COMPARISON SUMMARY
+================================================================================
+Primary metric: RMSE (real units). Temporal split; 3 split(s) x 3 trial(s) [full run].
+
+------------------------------------------------------------------------
+AVERAGE TEST RMSE BY MODEL AND SPLIT
+------------------------------------------------------------------------
+Model             20_80         50_50         80_20         Overall     
+------------------------------------------------------------------------
+XGBoost           0.000         6.379         12.857        6.412       
+Random Forest     0.000         6.394         12.889        6.428       
+Neural Network    0.000         6.395         12.936        6.444       
+........................................................................
+NAIVE BASELINES (the floor models must beat):
+last_value        0.000         8.625         18.039        8.888       
+moving_avg_4w     0.000         9.097         18.139        9.079       
+croston           0.000         9.809         21.853        10.554      
+
+------------------------------------------------------------------------
+BEST OVERALL MODEL (lowest single-trial test RMSE)
+------------------------------------------------------------------------
+Model: XGBoost
+Split: 50_50
+RMSE:      6.3775
+MAE (!=0): 8.7126
+R2:        -0.0145
+
+vs baselines on that split:
+  last_value     8.625  -> model BEATS it
+  moving_avg_4w  9.097  -> model BEATS it
+  croston        9.809  -> model BEATS it

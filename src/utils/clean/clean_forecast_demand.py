@@ -35,17 +35,21 @@ import pandas as pd
 # ----------------------------------------------------------------------------
 
 # Same-week signals that define / co-move with the target -> leakage.
+# v2 adds the two Shopify channels that now feed demand_qty (shopify_direct_qty,
+# shopify_bom_qty) and the contemporaneous work-order count (wo_opened); all same-week.
 LEAKAGE_SIGNAL_COLS = [
     "sh_outflow_qty", "build_consumed_qty", "sh_net_delta", "sh_inflow_qty",
     "sh_movement_events", "build_events", "shopify_ordered_qty",
     "shopify_unfulfilled_qty", "on_hand_eow",
+    "shopify_direct_qty", "shopify_bom_qty", "wo_opened",
 ]
 # Identifiers / SKU-name leakage (name encodes the project).
 ID_LEAKAGE_COLS = ["part_id", "part_name", "mpn"]
 # Includes current week (expanding mean over demand==0) -> target leakage.
 CURRENT_WEEK_LEAKAGE_COLS = ["cum_zero_share"]
 # >=80% null, non-target, non-leakage -> drop per null policy.
-DEAD_NULL_COLS = ["low_stock_level", "lead_time_days"]
+# v2: engineer_id (97% null, 8 distinct) and demand_adi (81.9% null) fail the rule.
+DEAD_NULL_COLS = ["low_stock_level", "lead_time_days", "engineer_id", "demand_adi"]
 # Single unique value -> zero variance.
 CONSTANT_COLS = ["kanban", "virtual"]
 # Calendar keys not in the allowed predictor list (iso_year is a raw time index
@@ -55,15 +59,21 @@ NON_PREDICTOR_KEYS = ["week_start", "iso_year"]
 TARGET_COL = "demand_qty"
 
 # Allowed predictors (after the drops above).
+# v2 adds leak-safe LEADING indicators (work-order activity in PRIOR weeks, shifted) and
+# an intermittency clock (weeks since last demand, shifted) - all known before week t.
 LAG_ROLL_PREDICTORS = [
     "demand_lag_1", "demand_lag_2", "demand_lag_4", "demand_lag_8", "demand_lag_12",
     "demand_roll_mean_4", "demand_roll_mean_8", "demand_roll_std_4",
+    "wo_opened_lag1", "wo_opened_roll4", "weeks_since_last_demand",
 ]
 CALENDAR_PREDICTORS = ["iso_week", "month", "quarter", "week_sin", "week_cos"]
 STATIC_CATEGORICAL = ["manufacturer", "status", "archived", "subassembly"]
+# v2 adds bom_indegree = # distinct finished-goods (drones) whose BOM uses this part
+# ("demand exposure": a component is needed whenever any drone that uses it sells/builds).
 STATIC_NUMERIC = [
     "is_project", "unit_cost_current", "price_current", "current_stock",
-    "bom_component_count", "on_order_current", "moq", "order_multiple", "num_vendors",
+    "bom_component_count", "bom_indegree", "on_order_current", "moq", "order_multiple",
+    "num_vendors",
 ]
 
 # Leak-safe naive-baseline columns we keep alongside predictors (shifted in the panel).

@@ -1,0 +1,31 @@
+==============================================================================
+MODALAI SHOPIFY SKU SALES - NEURAL NETWORK RESULTS
+==============================================================================
+Target: units_sold (winsorized + log1p; metrics inverted to real units)
+Primary metric: RMSE (lower=better). Temporal split; 3 split(s) x 3 trial(s)  [full run].
+
+----------------------------------------------------------------------
+PERFORMANCE BY SPLIT (mean +/- std over 3 trial(s))
+----------------------------------------------------------------------
+Split   Test RMSE           Test MAE          MAE!=0            Test R2         
+----------------------------------------------------------------------
+20_80      0.000 +/- 0.000    0.000 +/- 0.000     nan +/- nan    1.000 +/- 0.000
+50_50      6.395 +/- 0.006    1.058 +/- 0.004    8.80 +/- 0.03  -0.020 +/- 0.002
+80_20     12.936 +/- 0.000    1.677 +/- 0.012   14.62 +/- 0.03  -0.006 +/- 0.000
+
+----------------------------------------------------------------------
+BEST MODEL (lowest test RMSE)
+----------------------------------------------------------------------
+Split: 20_80   Trial: 1
+
+Best hyperparameters:
+  model__alpha: 0.1
+  model__batch_size: 128
+  model__hidden_layer_sizes: (32, 16)
+  model__learning_rate_init: 0.01
+
+Test metrics (real units):
+  RMSE:      0.0000
+  MAE:       0.0000
+  MAE (!=0): nan
+  R2:        1.0000

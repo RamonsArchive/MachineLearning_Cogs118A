@@ -1,5 +1,14 @@
 # Experiment 1 — ModalAI Part/Component Demand Forecasting (Regression)
 
+> **UPDATE — now on the v2 panel.** Experiment 1 uses `part_week_panel_v2.csv`, which folds
+> the **entire Shopify signal** into `demand_qty` (BOM roll-down of finished-good sales to
+> components + direct part-matched sales). This extends the series from 29 → **47
+> demand-bearing weeks (70-week span)** and adds leak-safe predictors (`bom_indegree`,
+> `wo_opened_lag1/roll4`, `weeks_since_last_demand`; `engineer_id`/`demand_adi` dropped for
+> ≥80% null). The §1/§4 history below describes the original v1 starvation problem and how it
+> was mitigated. A sibling **Experiment 3** (`forecast_sku_sales.py`) forecasts Shopify
+> SKU-sales directly on the full 70 weeks and beats the naive baselines more decisively.
+
 **A defense of the methodology, a full data-leakage audit, and an honest diagnosis of
 what limits performance — which is mostly *not* the hyperparameters.**
 

@@ -8,31 +8,31 @@ Target: demand_qty = max(sh_outflow_qty, build_consumed_qty)
 --------------------------------------------------
 DATASET OVERVIEW
 --------------------------------------------------
-Part-weeks (rows):     52461
-Distinct weeks:        29
-Week range:            2025-12-08 -> 2026-06-22
+Part-weeks (rows):     133070
+Distinct weeks:        70
+Week range:            2025-02-24 -> 2026-06-22
 
 --------------------------------------------------
 TARGET DISTRIBUTION (demand_qty) - zero-inflated & heavy-tailed
 --------------------------------------------------
-Zero part-weeks:       86.49% (intermittent demand)
-Mean (all):            22.9310
-Std  (all):            475.5576
+Zero part-weeks:       91.84% (intermittent demand)
+Mean (all):            10.4949
+Std  (all):            303.0002
 Max  (all):            61590.0   <- recount/correction spikes
 P50.0  (all):         0.0000
-P90.0  (all):         4.0000
-P99.0  (all):         309.4000
-P99.9  (all):         3939.8600
+P90.0  (all):         0.0000
+P99.0  (all):         112.0000
+P99.9  (all):         1777.8620
 
-Among NON-ZERO part-weeks (n=7086):
-  Mean: 169.7687  Median: 13.0000  Max: 61590.0
+Among NON-ZERO part-weeks (n=10864):
+  Mean: 128.5485  Median: 8.0000  Max: 61590.0
 
 --------------------------------------------------
 NAIVE BASELINE FLOOR (raw target)
 --------------------------------------------------
 Mean predictor (always predict global mean):
-  RMSE: 475.5531
-  MAE:  42.2884
+  RMSE: 302.9991
+  MAE:  19.9080
   R2:   0.0000 (by definition)
 
 Note: the experiment ALSO reports last-value, 4-week moving-average,
